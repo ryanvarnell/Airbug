@@ -43,6 +43,7 @@ class CommandHandler {
                     return bingChilling();
             }
             case "img" -> { return img(); }
+            case "gif" -> { return gif(); }
         }
         return null;
     }
@@ -70,5 +71,15 @@ class CommandHandler {
     private static Mono<Message> img() {
         String searchQuery = message.getContent().replaceFirst(rootCommand, "");
         return message.getChannel().flatMap(channel -> channel.createMessage(ImageSearch.getImage(searchQuery)));
+    }
+
+    /**
+     * Gif search powered by Giphy
+     * @return Gif related to user's query
+     */
+    private static Mono<Message> gif() {
+        String searchQuery = message.getContent().substring(rootCommand.length() + 2);
+        System.out.println(searchQuery);
+        return message.getChannel().flatMap(channel -> channel.createMessage(GiphySearch.getGif(searchQuery)));
     }
 }
