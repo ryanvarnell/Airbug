@@ -14,9 +14,9 @@ public class Airbug {
                 Message message = event.getMessage();
                 if (message.getContent().charAt(0) == '-') {
                     new CommandHandler(message);
-                    message.delete();
                     return CommandHandler.process();
                 }
+                message.delete();
                 return Mono.empty();
             });
         });
