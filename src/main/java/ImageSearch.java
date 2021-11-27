@@ -1,7 +1,6 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,11 +13,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * Class to search the web using Bing's API that's almost 100% identical to Bing's documentation on how to use their
+ * API lmao
+ * @author Ryan Varnell.
+ */
 public class ImageSearch {
     static String subscriptionKey = System.getenv("BING_SEARCH_KEY");
     static String host = "https://api.bing.microsoft.com";
     static String path = "/v7.0/images/search";
 
+    /**
+     * Gets an image based on the user's query.
+     * @param searchQuery The user's query.
+     * @return An image related to the query.
+     */
     public static String getImage(String searchQuery) {
         // construct the search request URL (in the form of endpoint + query string)
         URL url;
