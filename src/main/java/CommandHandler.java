@@ -26,6 +26,7 @@ class CommandHandler {
                 if (modifiers[0].equalsIgnoreCase("chilling"))
                     return bingChilling();
             }
+            case "img" -> { return img(modifiers[0]); }
         }
         return null;
     }
@@ -36,5 +37,9 @@ class CommandHandler {
 
     private static Mono<Message> bingChilling() {
         return message.getChannel().flatMap(channel -> channel.createMessage(":cold_face:"));
+    }
+
+    private static Mono<Message> img(String searchQuery) {
+        return message.getChannel().flatMap(channel -> channel.createMessage(ImageSearch.getImage(searchQuery)));
     }
 }
