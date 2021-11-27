@@ -60,8 +60,7 @@ public class ImageSearch {
         } catch (IOException e) {
             return "Couldn't close the stream???? what";
         }
-        JsonParser parser = new JsonParser();
-        JsonObject json = parser.parse(results.jsonResponse).getAsJsonObject();
+        JsonObject json = JsonParser.parseString(results.jsonResponse).getAsJsonObject();
         //get the first image result from the JSON object
         JsonArray jsonResults = json.getAsJsonArray("value");
         JsonObject first_result = (JsonObject)jsonResults.get(0);
