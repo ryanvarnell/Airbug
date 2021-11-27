@@ -63,14 +63,7 @@ public class Airbug {
     }
 
     public static Mono<Message> getImage(Message message, String searchTerm) {
-        WebSearch webSearch;
-        try {
-            webSearch = new WebSearch(message);
-        } catch (IOException e) {
-            return message.getChannel().flatMap(channel -> channel.createMessage("Nothing found."));
-        }
-        WebSearch finalWebSearch = webSearch;
-        return message.getChannel().flatMap(channel -> channel.createMessage(finalWebSearch.getImage()));
+        return null;
     }
 
     public static void bing(Message message) {
