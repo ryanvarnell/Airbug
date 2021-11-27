@@ -9,29 +9,18 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 
 public class Airbug {
-    private static final String discordToken = System.getenv("AIRBUG_TOKEN");
-    private static final DiscordClient client = DiscordClient.create(discordToken);
+    private static final DiscordClient client = DiscordClient.create(System.getenv("AIRBUG_TOKEN"));
 
     public static void main(String[] args) {
         Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> {
-            // Confirm login
-            Mono<Void> printOnLogin = gateway.on(ReadyEvent.class, event ->
-                            Mono.fromRunnable(() -> {
-                                final User self = event.getSelf();
-                                System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
-                            }))
-                    .then();
-
             // Check messages for command prompt
-            Mono<Void> checkForPrompt = gateway.on(MessageCreateEvent.class, event -> {
+            return gateway.on(MessageCreateEvent.class, event -> {
                 Message message = event.getMessage();
                 if (message.getContent().charAt(0) == '-') {
                     return handleCommand(message);
                 }
                 return Mono.empty();
-            }).then();
-
-            return printOnLogin.and(checkForPrompt);
+            });
         });
         login.block();
     }
