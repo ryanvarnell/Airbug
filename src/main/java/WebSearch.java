@@ -48,7 +48,7 @@ public class WebSearch {
      * @param searchQuery The user's query.
      */
     public void Search(String searchQuery) throws IOException {
-        // construct the search request URL (in the form of endpoint + query string)
+        // Construct the search request URL (in the form of endpoint + query string)
         URL url;
         url = new URL(host + path + "?q=" +  URLEncoder.encode(searchQuery, StandardCharsets.UTF_8));
 
@@ -56,14 +56,14 @@ public class WebSearch {
         connection = (HttpsURLConnection)url.openConnection();
         connection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-        // receive JSON body
+        // Receive JSON body
         InputStream stream;
         stream = connection.getInputStream();
         String response = new Scanner(stream).useDelimiter("\\A").next();
-        // construct result object for return
+        // Construct result object for return
         SearchResults results = new SearchResults(new HashMap<>(), response);
 
-        // extract Bing-related HTTP headers
+        // Extract Bing-related HTTP headers
         Map<String, List<String>> headers = connection.getHeaderFields();
         for (String header : headers.keySet()) {
             if (header == null) continue;      // may have null key
@@ -75,9 +75,21 @@ public class WebSearch {
         stream.close();
 
         JsonObject json = JsonParser.parseString(results.jsonResponse).getAsJsonObject();
-        //get the first image result from the JSON object
+        // Get the first image result from the JSON object
         JsonArray jsonResults = json.getAsJsonArray("value");
         // Store the first (i.e. most relevant) result in searchResult.
         searchResult = (JsonObject)jsonResults.get(0);
+    }
+}
+
+/**
+ * Class to contain the search results from using Bing's API.
+ */
+class SearchResults {
+    HashMap<String, String> relevantHeaders;
+    String jsonResponse;
+    SearchResults(HashMap<String, String> headers, String json) {
+        relevantHeaders = headers;
+        jsonResponse = json;
     }
 }

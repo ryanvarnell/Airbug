@@ -13,6 +13,9 @@ public class Airbug {
     private static final String discordToken = System.getenv("AIRBUG_TOKEN");
     private static final DiscordClient client = DiscordClient.create(discordToken);
 
+    /**
+     * Main loop
+     */
     public static void main(String[] args) {
         Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> {
             // Check messages for command prompt

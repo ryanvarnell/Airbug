@@ -3,7 +3,7 @@ import com.trievosoftware.giphy4j.entity.search.SearchFeed;
 import com.trievosoftware.giphy4j.exception.GiphyException;
 
 /**
- * Class to search Giphy
+ * Class to search Giphy and grab the url to a relevant gif.
  * @author Ryan Varnell
  */
 public class GiphySearch {
