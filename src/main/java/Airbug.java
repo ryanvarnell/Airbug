@@ -19,6 +19,7 @@ public class Airbug {
      * Main loop
      */
     public static void main(String[] args) {
+
         // Check messages for command prompt
         Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) ->
                 gateway.on(MessageCreateEvent.class, event -> {
@@ -26,7 +27,9 @@ public class Airbug {
                     // If the user's message begins with the command prompt, open a new CommandHandler and send it the
                     // message to be processed.
                     if (message.getContent().startsWith(commandPrompt)) {
-                        return CommandHandler.process(message);
+                        Mono<Message> response = CommandHandler.process(message);
+                        message.delete();
+                        return response;
                     }
                     return Mono.empty();
                 }));

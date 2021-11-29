@@ -33,8 +33,8 @@ public class CommandHandler {
             }
             case "img", "image" -> { return img(); }
             case "gif", "giphy" -> { return gif(); }
+            default -> { return null; }
         }
-        return null;
     }
 
     /**
