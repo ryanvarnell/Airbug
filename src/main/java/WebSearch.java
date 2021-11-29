@@ -96,17 +96,14 @@ public class WebSearch {
     }
 
     public EmbedCreateSpec getResultsAsEmbedded() {
-        JsonObject jsonObject = (JsonObject) JsonParser.parseString(searchResult.jsonResponse);
-        System.out.println(jsonObject.get("webPages"));
-        String webpages = jsonObject.get("webPages").toString();
-        System.out.println(webpages);
-        JsonArray jsonResults = webPages.getAsJsonArray("value");
-        JsonObject result = (JsonObject) jsonResults.get(0);
+        JsonObject jsonString = (JsonObject) JsonParser.parseString(searchResult.jsonResponse);
+        JsonObject jsonWebPageString = jsonString.get("webPages").getAsJsonObject();
+        JsonArray webPages = jsonWebPageString.getAsJsonArray("value");
+        JsonObject result = (JsonObject) webPages.get(0);
         System.out.println(result);
         return EmbedCreateSpec.builder()
                 .color(Color.HOKI)
                 .description(result.get("snippet").getAsString())
-                .thumbnail(result.get("thumbnailUrl").getAsString())
                 .title(result.get("name").getAsString())
                 .url(result.get("url").getAsString())
                 .build();
