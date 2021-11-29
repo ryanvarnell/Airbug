@@ -1,8 +1,6 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.rest.util.Color;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -23,36 +21,45 @@ import java.util.Scanner;
 public class WebSearch {
     private final static String subscriptionKey = System.getenv("BING_SEARCH_KEY");
     private final static String host = "https://api.bing.microsoft.com";
-    private final static String imagePath = "/v7.0/images/search";
-    private final static String webPath = "/v7.0/search";
-    private static SearchResults searchResult;
-    private static char searchType;
 
-    /**
-     * 2-Parameter constructor.
-     * @param type Search type. "I" for image, "W" for web.
-     * @param searchQuery The search query.
-     */
-    WebSearch(char type, String searchQuery) {
-        searchType = type;
+    public static JsonObject getWebPage(String searchQuery) {
+        String bingSearchPath = "/v7.0/search";
+        SearchResults results;
         try {
-            searchResult = search(searchQuery);
+            results = search(searchQuery, bingSearchPath);
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
+        JsonObject jsonString = (JsonObject) JsonParser.parseString(results.jsonResponse);
+        JsonObject jsonWebPageString = jsonString.get("webPages").getAsJsonObject();
+        JsonArray webPages = jsonWebPageString.getAsJsonArray("value");
+        JsonObject result = (JsonObject) webPages.get(0);
+        System.out.println(result);
+        return result;
+    }
+
+    public static String getImage(String searchQuery) {
+        String bingImagePath = "/v7.0/images/search";
+        SearchResults results;
+        try {
+            results = search(searchQuery, bingImagePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Something went wrong";
+        }
+        JsonObject json = JsonParser.parseString(results.jsonResponse).getAsJsonObject();
+        JsonArray jsonResults = json.getAsJsonArray("value");
+        JsonObject searchResult = (JsonObject) jsonResults.get(0);
+        return searchResult.get("thumbnailUrl").getAsString();
     }
 
     /**
      * Gets an image based on the user's query.
      * @param searchQuery The user's query.
      */
-    public SearchResults search(String searchQuery) throws IOException {
+    public static SearchResults search(String searchQuery, String path) throws IOException {
         // Construct the search request URL (in the form of endpoint + query string)
-        String path;
-        if (searchType == 'I')
-            path = imagePath;
-        else
-            path = webPath;
         URL url = new URL(host + path + "?q="
                 + URLEncoder.encode(searchQuery, StandardCharsets.UTF_8)
                 + "&"
@@ -79,34 +86,6 @@ public class WebSearch {
         stream.close();
 
         return results;
-    }
-
-    /**
-     * Gets the image from the first relevant search result relevant to the search query.
-     * @return Image url.
-     */
-    public String getImageUrl() {
-        JsonObject json = JsonParser.parseString(searchResult.jsonResponse).getAsJsonObject();
-
-        // Get the first image result from the JSON object
-        JsonArray jsonResults = json.getAsJsonArray("value");
-        // Store the first (i.e. most relevant) result in searchResult.
-        JsonObject searchResult = (JsonObject) jsonResults.get(0);
-        return searchResult.get("thumbnailUrl").getAsString();
-    }
-
-    public EmbedCreateSpec getResultsAsEmbedded() {
-        JsonObject jsonString = (JsonObject) JsonParser.parseString(searchResult.jsonResponse);
-        JsonObject jsonWebPageString = jsonString.get("webPages").getAsJsonObject();
-        JsonArray webPages = jsonWebPageString.getAsJsonArray("value");
-        JsonObject result = (JsonObject) webPages.get(0);
-        System.out.println(result);
-        return EmbedCreateSpec.builder()
-                .color(Color.HOKI)
-                .description(result.get("snippet").getAsString())
-                .title(result.get("name").getAsString())
-                .url(result.get("url").getAsString())
-                .build();
     }
 }
 

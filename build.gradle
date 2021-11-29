@@ -25,6 +25,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.trievosoftware/giphy4j
     implementation 'com.trievosoftware:giphy4j:1.0.0'
+
+    // https://mvnrepository.com/artifact/tokyo.northside/java-oxford-dictionaries
+    implementation 'tokyo.northside:java-oxford-dictionaries:0.2.0'
 }
 
 test {

@@ -1,5 +1,7 @@
+import com.google.gson.JsonObject;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -40,12 +42,12 @@ class CommandHandler {
         switch (rootCommand) {
             case "ping" -> { return ping(); }
             case "b", "bing", "g", "google", "ddg", "duckduckgo", "aj", "askjeeves" -> {
-                if (modifiers[0].equalsIgnoreCase("chilling"))
+                if (rootCommand.equals("bing") && modifiers[0].equalsIgnoreCase("chilling"))
                     return bingChilling();
                 else
                     return bing();
             }
-            case "img" -> { return img(); }
+            case "img", "image" -> { return img(); }
             case "gif" -> { return gif(); }
         }
         return null;
@@ -73,8 +75,8 @@ class CommandHandler {
      */
     private static Mono<Message> img() {
         String searchQuery = message.getContent().substring(rootCommand.length() + 2);
-        WebSearch webSearch = new WebSearch('I', searchQuery);
-        String result = webSearch.getImageUrl();
+        //WebSearch webSearch = new WebSearch('I', searchQuery);
+        String result = WebSearch.getImage(searchQuery);
         return message.getChannel().flatMap(channel -> channel.createMessage(result));
     }
 
@@ -93,8 +95,16 @@ class CommandHandler {
      */
     private static Mono<Message> bing() {
         String searchQuery = message.getContent().substring(rootCommand.length() + 2);
-        WebSearch webSearch = new WebSearch('W', searchQuery);
-        EmbedCreateSpec embed = webSearch.getResultsAsEmbedded();
+        //WebSearch webSearch = new WebSearch('W', searchQuery);
+        JsonObject webpage = WebSearch.getWebPage(searchQuery);
+        assert webpage != null;
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.HOKI)
+                .thumbnail(WebSearch.getImage(searchQuery))
+                .description(webpage.get("snippet").getAsString())
+                .title(webpage.get("name").getAsString())
+                .url(webpage.get("url").getAsString())
+                .build();
         return message.getChannel().flatMap(channel -> channel.createMessage(embed));
     }
 }
