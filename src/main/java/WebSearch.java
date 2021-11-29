@@ -1,6 +1,11 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import discord4j.core.object.Embed;
+import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Color;
+import reactor.core.publisher.Mono;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,14 +38,6 @@ public class WebSearch {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Gets the image from the first relevant search result relevant to the search query.
-     * @return Image url.
-     */
-    public String getImageUrl() {
-        return searchResult.get("thumbnailUrl").getAsString();
     }
 
     /**
@@ -79,6 +76,19 @@ public class WebSearch {
         JsonArray jsonResults = json.getAsJsonArray("value");
         // Store the first (i.e. most relevant) result in searchResult.
         searchResult = (JsonObject)jsonResults.get(0);
+    }
+
+    /**
+     * Gets the image from the first relevant search result relevant to the search query.
+     * @return Image url.
+     */
+    public String getImageUrl() {
+        return searchResult.get("thumbnailUrl").getAsString();
+    }
+
+    public Mono<Embed> getResultsAsEmbedded() {
+        EmbedCreateSpec.Builder embed = EmbedCreateSpec.builder().color(Color.BLUE);
+        return null;
     }
 }
 
