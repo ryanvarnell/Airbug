@@ -70,8 +70,9 @@ class CommandHandler {
      */
     private static Mono<Message> img() {
         String searchQuery = message.getContent().replaceFirst(rootCommand, "");
-        return message.getChannel().flatMap(channel -> channel
-                .createMessage(WebSearch.Search(searchQuery).get("thumbnailUrl").getAsString()));
+        WebSearch webSearch = new WebSearch(searchQuery);
+        String result = webSearch.getImageUrl();
+        return message.getChannel().flatMap(channel -> channel.createMessage(result));
     }
 
     /**
