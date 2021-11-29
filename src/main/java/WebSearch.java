@@ -23,16 +23,20 @@ import java.util.Scanner;
 public class WebSearch {
     private final static String subscriptionKey = System.getenv("BING_SEARCH_KEY");
     private final static String host = "https://api.bing.microsoft.com";
-    private final static String path = "/v7.0/images/search";
-    private static JsonObject searchResult;
+    private final static String imagePath = "/v7.0/images/search";
+    private final static String webPath = "/v7.0/search";
+    private static SearchResults searchResult;
+    private static char searchType;
 
     /**
-     * Single parameter constructor.
-     * @param searchQuery The term/string to be searched.
+     * 2-Parameter constructor.
+     * @param type Search type. "I" for image, "W" for web.
+     * @param searchQuery The search query.
      */
-    WebSearch(String searchQuery) {
+    WebSearch(char type, String searchQuery) {
+        searchType = type;
         try {
-            Search(searchQuery);
+            searchResult = search(searchQuery);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,18 +46,23 @@ public class WebSearch {
      * Gets an image based on the user's query.
      * @param searchQuery The user's query.
      */
-    public void Search(String searchQuery) throws IOException {
+    public SearchResults search(String searchQuery) throws IOException {
         // Construct the search request URL (in the form of endpoint + query string)
-        URL url;
-        url = new URL(host + path + "?q=" +  URLEncoder.encode(searchQuery, StandardCharsets.UTF_8));
+        String path;
+        if (searchType == 'I')
+            path = imagePath;
+        else
+            path = webPath;
+        URL url = new URL(host + path + "?q="
+                + URLEncoder.encode(searchQuery, StandardCharsets.UTF_8)
+                + "&"
+                + URLEncoder.encode("count=1-", StandardCharsets.UTF_8));
 
-        HttpsURLConnection connection;
-        connection = (HttpsURLConnection)url.openConnection();
+        HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
         connection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
 
         // Receive JSON body
-        InputStream stream;
-        stream = connection.getInputStream();
+        InputStream stream = connection.getInputStream();
         String response = new Scanner(stream).useDelimiter("\\A").next();
         // Construct result object for return
         SearchResults results = new SearchResults(new HashMap<>(), response);
@@ -69,11 +78,7 @@ public class WebSearch {
 
         stream.close();
 
-        JsonObject json = JsonParser.parseString(results.jsonResponse).getAsJsonObject();
-        // Get the first image result from the JSON object
-        JsonArray jsonResults = json.getAsJsonArray("value");
-        // Store the first (i.e. most relevant) result in searchResult.
-        searchResult = (JsonObject)jsonResults.get(0);
+        return results;
     }
 
     /**
@@ -81,16 +86,29 @@ public class WebSearch {
      * @return Image url.
      */
     public String getImageUrl() {
+        JsonObject json = JsonParser.parseString(searchResult.jsonResponse).getAsJsonObject();
+
+        // Get the first image result from the JSON object
+        JsonArray jsonResults = json.getAsJsonArray("value");
+        // Store the first (i.e. most relevant) result in searchResult.
+        JsonObject searchResult = (JsonObject) jsonResults.get(0);
         return searchResult.get("thumbnailUrl").getAsString();
     }
 
     public EmbedCreateSpec getResultsAsEmbedded() {
-        System.out.println(searchResult.toString());
+        JsonObject jsonObject = (JsonObject) JsonParser.parseString(searchResult.jsonResponse);
+        System.out.println(jsonObject.get("webPages"));
+        String webpages = jsonObject.get("webPages").toString();
+        System.out.println(webpages);
+        JsonArray jsonResults = webPages.getAsJsonArray("value");
+        JsonObject result = (JsonObject) jsonResults.get(0);
+        System.out.println(result);
         return EmbedCreateSpec.builder()
                 .color(Color.HOKI)
-                .thumbnail(searchResult.get("thumbnailUrl").getAsString())
-                .title(searchResult.get("name").getAsString())
-                .url(searchResult.get("hostPageUrl").getAsString())
+                .description(result.get("snippet").getAsString())
+                .thumbnail(result.get("thumbnailUrl").getAsString())
+                .title(result.get("name").getAsString())
+                .url(result.get("url").getAsString())
                 .build();
     }
 }

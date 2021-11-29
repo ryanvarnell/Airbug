@@ -73,7 +73,7 @@ class CommandHandler {
      */
     private static Mono<Message> img() {
         String searchQuery = message.getContent().substring(rootCommand.length() + 2);
-        WebSearch webSearch = new WebSearch(searchQuery);
+        WebSearch webSearch = new WebSearch('I', searchQuery);
         String result = webSearch.getImageUrl();
         return message.getChannel().flatMap(channel -> channel.createMessage(result));
     }
@@ -93,7 +93,7 @@ class CommandHandler {
      */
     private static Mono<Message> bing() {
         String searchQuery = message.getContent().substring(rootCommand.length() + 2);
-        WebSearch webSearch = new WebSearch(searchQuery);
+        WebSearch webSearch = new WebSearch('W', searchQuery);
         EmbedCreateSpec embed = webSearch.getResultsAsEmbedded();
         return message.getChannel().flatMap(channel -> channel.createMessage(embed));
     }
