@@ -18,7 +18,7 @@ import java.util.Scanner;
  * API lmao
  * @author Ryan Varnell.
  */
-public class ImageSearch {
+public class WebSearch {
     static String subscriptionKey = System.getenv("BING_SEARCH_KEY");
     static String host = "https://api.bing.microsoft.com";
     static String path = "/v7.0/images/search";
@@ -28,29 +28,18 @@ public class ImageSearch {
      * @param searchQuery The user's query.
      * @return An image related to the query.
      */
-    public static String getImage(String searchQuery) {
+    public static JsonObject Search(String searchQuery) {
         // construct the search request URL (in the form of endpoint + query string)
         URL url;
-        try {
-            url = new URL(host + path + "?q=" +  URLEncoder.encode(searchQuery, StandardCharsets.UTF_8));
-        } catch (MalformedURLException e) {
-            return "URL was borked";
-        }
+        url = new URL(host + path + "?q=" +  URLEncoder.encode(searchQuery, StandardCharsets.UTF_8));
+
         HttpsURLConnection connection;
-        try {
-            connection = (HttpsURLConnection)url.openConnection();
-        } catch (IOException e) {
-            return "Couldn't open a connection to bing servers.";
-        }
+        connection = (HttpsURLConnection)url.openConnection();
         connection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
 
         // receive JSON body
         InputStream stream;
-        try {
-            stream = connection.getInputStream();
-        } catch (IOException e) {
-            return "Failure to open input stream";
-        }
+        stream = connection.getInputStream();
         String response = new Scanner(stream).useDelimiter("\\A").next();
         // construct result object for return
         SearchResults results = new SearchResults(new HashMap<>(), response);
@@ -64,15 +53,12 @@ public class ImageSearch {
             }
         }
 
-        try {
-            stream.close();
-        } catch (IOException e) {
-            return "Couldn't close the stream???? what";
-        }
+        stream.close();
+
         JsonObject json = JsonParser.parseString(results.jsonResponse).getAsJsonObject();
         //get the first image result from the JSON object
         JsonArray jsonResults = json.getAsJsonArray("value");
-        JsonObject first_result = (JsonObject)jsonResults.get(0);
-        return first_result.get("thumbnailUrl").getAsString();
+        return (JsonObject)jsonResults.get(0);
+        //return first_result.get("thumbnailUrl").getAsString();
     }
 }

@@ -70,7 +70,8 @@ class CommandHandler {
      */
     private static Mono<Message> img() {
         String searchQuery = message.getContent().replaceFirst(rootCommand, "");
-        return message.getChannel().flatMap(channel -> channel.createMessage(ImageSearch.getImage(searchQuery)));
+        return message.getChannel().flatMap(channel -> channel
+                .createMessage(WebSearch.Search(searchQuery).get("thumbnailUrl").getAsString()));
     }
 
     /**
@@ -79,7 +80,6 @@ class CommandHandler {
      */
     private static Mono<Message> gif() {
         String searchQuery = message.getContent().substring(rootCommand.length() + 2);
-        System.out.println(searchQuery);
         return message.getChannel().flatMap(channel -> channel.createMessage(GiphySearch.getGif(searchQuery)));
     }
 }

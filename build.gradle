@@ -23,7 +23,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.9'
 
-    implementation 'com.github.thiagolocatelli:parse4j:1.4'
+    // https://mvnrepository.com/artifact/com.trievosoftware/giphy4j
+    implementation 'com.trievosoftware:giphy4j:1.0.0'
 }
 
 test {
