@@ -51,7 +51,7 @@ class CommandHandler {
                     return bing();
             }
             case "img", "image" -> { return img(); }
-            case "gif" -> { return gif(); }
+            case "gif", "giphy" -> { return gif(); }
         }
         return null;
     }
