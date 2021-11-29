@@ -1,0 +1,5 @@
+help ~> this command
+ping ~> pong
+bing ~> web search
+image ~> image search
+giphy ~> gif search

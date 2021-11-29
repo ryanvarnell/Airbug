@@ -3,7 +3,11 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 /**
  * Class to handle user commands.
@@ -24,15 +28,20 @@ public class CommandHandler {
         parseCommand(message);
 
         switch (rootCommand) {
-            case "ping" -> { return ping(); }
-            case "b", "bing", "g", "google", "ddg", "duckduckgo", "aj", "askjeeves" -> {
+            case "ping", "p" -> { return ping(); }
+            case "help", "h" -> { return help(); }
+            case "bing", "b",
+                    "google", "g",
+                    "duckduckgo", "ddg",
+                    "askjeeves", "aj",
+                    "search" -> {
                 if (rootCommand.equals("bing") && modifiers[0].equalsIgnoreCase("chilling"))
                     return bingChilling();
                 else
                     return bing();
             }
-            case "img", "image" -> { return img(); }
-            case "gif", "giphy" -> { return gif(); }
+            case "image", "img" -> { return img(); }
+            case "giphy", "gif" -> { return gif(); }
             default -> { return null; }
         }
     }
@@ -68,6 +77,21 @@ public class CommandHandler {
      */
     private static Mono<Message> ping() {
         return respondWith("pong!");
+    }
+
+    private static Mono<Message> help() {
+        Scanner scanner;
+        try {
+            scanner = new Scanner(new File("help.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return respondWith("no help file means no help");
+        }
+        StringBuilder help = new StringBuilder();
+        while (scanner.hasNextLine()) {
+            help.append(scanner.nextLine()).append("\n");
+        }
+        return respondWith(help.toString());
     }
 
     /**
