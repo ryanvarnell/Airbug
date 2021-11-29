@@ -1,10 +1,8 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
-import reactor.core.publisher.Mono;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -86,9 +84,14 @@ public class WebSearch {
         return searchResult.get("thumbnailUrl").getAsString();
     }
 
-    public Mono<Embed> getResultsAsEmbedded() {
-        EmbedCreateSpec.Builder embed = EmbedCreateSpec.builder().color(Color.BLUE);
-        return null;
+    public EmbedCreateSpec getResultsAsEmbedded() {
+        System.out.println(searchResult.toString());
+        return EmbedCreateSpec.builder()
+                .color(Color.HOKI)
+                .thumbnail(searchResult.get("thumbnailUrl").getAsString())
+                .title(searchResult.get("name").getAsString())
+                .url(searchResult.get("hostPageUrl").getAsString())
+                .build();
     }
 }
 

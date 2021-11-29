@@ -1,4 +1,5 @@
 import discord4j.core.object.entity.Message;
+import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -38,9 +39,11 @@ class CommandHandler {
     public static Mono<Message> process() {
         switch (rootCommand) {
             case "ping" -> { return ping(); }
-            case "bing" -> {
+            case "b", "bing", "g", "google", "ddg", "duckduckgo", "aj", "askjeeves" -> {
                 if (modifiers[0].equalsIgnoreCase("chilling"))
                     return bingChilling();
+                else
+                    return bing();
             }
             case "img" -> { return img(); }
             case "gif" -> { return gif(); }
@@ -69,7 +72,7 @@ class CommandHandler {
      * @return Image related to user's query
      */
     private static Mono<Message> img() {
-        String searchQuery = message.getContent().replaceFirst(rootCommand, "");
+        String searchQuery = message.getContent().substring(rootCommand.length() + 2);
         WebSearch webSearch = new WebSearch(searchQuery);
         String result = webSearch.getImageUrl();
         return message.getChannel().flatMap(channel -> channel.createMessage(result));
@@ -82,5 +85,16 @@ class CommandHandler {
     private static Mono<Message> gif() {
         String searchQuery = message.getContent().substring(rootCommand.length() + 2);
         return message.getChannel().flatMap(channel -> channel.createMessage(GiphySearch.getGif(searchQuery)));
+    }
+
+    /**
+     * Web search command, uses Bing API.
+     * @return A message containing an embedded search result.
+     */
+    private static Mono<Message> bing() {
+        String searchQuery = message.getContent().substring(rootCommand.length() + 2);
+        WebSearch webSearch = new WebSearch(searchQuery);
+        EmbedCreateSpec embed = webSearch.getResultsAsEmbedded();
+        return message.getChannel().flatMap(channel -> channel.createMessage(embed));
     }
 }
