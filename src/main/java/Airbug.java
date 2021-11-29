@@ -19,19 +19,17 @@ public class Airbug {
      * Main loop
      */
     public static void main(String[] args) {
-        Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> {
-            // Check messages for command prompt
-            return gateway.on(MessageCreateEvent.class, event -> {
-                Message message = event.getMessage();
-                // If the user's message begins with the command prompt, open a new CommandHandler and send it the
-                // message to be processed.
-                if (message.getContent().startsWith(commandPrompt)) {
-                    new CommandHandler(message);
-                    return CommandHandler.process();
-                }
-                return Mono.empty();
-            });
-        });
+        // Check messages for command prompt
+        Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) ->
+                gateway.on(MessageCreateEvent.class, event -> {
+                    Message message = event.getMessage();
+                    // If the user's message begins with the command prompt, open a new CommandHandler and send it the
+                    // message to be processed.
+                    if (message.getContent().startsWith(commandPrompt)) {
+                        return CommandHandler.process(message);
+                    }
+                    return Mono.empty();
+                }));
         login.block();
     }
 }

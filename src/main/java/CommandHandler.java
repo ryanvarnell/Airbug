@@ -9,7 +9,7 @@ import java.util.Arrays;
  * Class to handle user commands.
  * @author Ryan Varnell
  */
-class CommandHandler {
+public class CommandHandler {
     private static final String prompt = Airbug.commandPrompt;
     private static Message message;
     private static String rootCommand;
@@ -17,31 +17,12 @@ class CommandHandler {
     private static String[] modifiers;
 
     /**
-     * Single-parameter constructor. Calls parseCommand.
-     * @param message Message with command to be processed.
-     */
-    CommandHandler(Message message) {
-        parseCommand(message);
-    }
-
-    /**
-     * Parses the command into more easily controllable formats.
-     * @param message The message to be parsed.
-     */
-    private void parseCommand(Message message) {
-        CommandHandler.message = message;
-        String messageString = message.getContent().replaceFirst(prompt, "");
-        String[] tokenizedMessageString = messageString.split("\\s+");
-        rootCommand = tokenizedMessageString[0];
-        query = messageString.replaceFirst(rootCommand + " ", "");
-        modifiers = Arrays.copyOfRange(tokenizedMessageString, 1, tokenizedMessageString.length);
-    }
-
-    /**
      * Chooses which command to run based on the root command.
      * @return The result of the command ran.
      */
-    public static Mono<Message> process() {
+    public static Mono<Message> process(Message message) {
+        parseCommand(message);
+
         switch (rootCommand) {
             case "ping" -> { return ping(); }
             case "b", "bing", "g", "google", "ddg", "duckduckgo", "aj", "askjeeves" -> {
@@ -54,6 +35,19 @@ class CommandHandler {
             case "gif", "giphy" -> { return gif(); }
         }
         return null;
+    }
+
+    /**
+     * Parses the command into more easily controllable formats.
+     * @param message The message to be parsed.
+     */
+    private static void parseCommand(Message message) {
+        CommandHandler.message = message;
+        String messageString = message.getContent().replaceFirst(prompt, "").toLowerCase();
+        String[] tokenizedMessageString = messageString.split("\\s+");
+        rootCommand = tokenizedMessageString[0];
+        query = messageString.replaceFirst(rootCommand + " ", "");
+        modifiers = Arrays.copyOfRange(tokenizedMessageString, 1, tokenizedMessageString.length);
     }
 
     /**
