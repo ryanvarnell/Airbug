@@ -42,6 +42,7 @@ public class CommandHandler {
             }
             case "image", "img" -> { return img(); }
             case "giphy", "gif" -> { return gif(); }
+            case "wiki", "w" -> { return wiki(); }
             default -> { return null; }
         }
     }
@@ -87,10 +88,11 @@ public class CommandHandler {
             e.printStackTrace();
             return respondWith("no help file means no help");
         }
-        StringBuilder help = new StringBuilder();
+        StringBuilder help = new StringBuilder("```\n");
         while (scanner.hasNextLine()) {
             help.append(scanner.nextLine()).append("\n");
         }
+        help.append("\n```");
         return respondWith(help.toString());
     }
 
@@ -130,6 +132,31 @@ public class CommandHandler {
             embed = EmbedCreateSpec.builder()
                     .color(Color.HOKI)
                     .thumbnail(BingSearch.getImage(query))
+                    .description(webpage.get("snippet").getAsString())
+                    .title(webpage.get("name").getAsString())
+                    .url(webpage.get("url").getAsString())
+                    .build();
+        } else {
+            respondWith("Something went wrong");
+        }
+        return respondWith(embed);
+    }
+
+    /**
+     * This a JANK wiki command, but it'll work for what I'm using it for.
+     * @return Embedded wiki result.
+     */
+    private static Mono<Message> wiki() {
+        JsonObject webpage = BingSearch.getWebPage(query + " wiki");
+        // Builds an embed with properties of the webpage.
+        EmbedCreateSpec embed = null;
+        System.out.println(webpage);
+        if (webpage != null) {
+            embed = EmbedCreateSpec.builder()
+                    .color(Color.DEEP_LILAC).author("Wikipedia, the Free Encyclopedia",
+                            "https://en.wikipedia.org/wiki/Main_Page",
+                            "https://www.famouslogos.org/wp-content/uploads/2009/04/wikipediafav.png")
+                    .thumbnail(BingSearch.getImage(webpage.get("name").getAsString() + " logo"))
                     .description(webpage.get("snippet").getAsString())
                     .title(webpage.get("name").getAsString())
                     .url(webpage.get("url").getAsString())

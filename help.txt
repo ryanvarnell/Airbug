@@ -1,5 +1,6 @@
-help ~> this command
-ping ~> pong
-bing ~> web search
-image ~> image search
-giphy ~> gif search
+help    ~>  this command
+ping    ~>  pong
+bing    ~>  web search
+image   ~>  image search
+giphy   ~>  gif search
+wiki    ~>  will (hopefully) search wikipedia.
