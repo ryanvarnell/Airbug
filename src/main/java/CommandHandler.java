@@ -3,7 +3,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
 
 /**
@@ -11,16 +10,17 @@ import java.util.Arrays;
  * @author Ryan Varnell
  */
 class CommandHandler {
-    static String rootCommand;
-    static String[] modifiers;
-    static Message message;
+    private static final String prompt = Airbug.commandPrompt;
+    private static Message message;
+    private static String rootCommand;
+    private static String query;
+    private static String[] modifiers;
 
     /**
-     * Single-parameter constructor.
+     * Single-parameter constructor. Calls parseCommand.
      * @param message Message with command to be processed.
      */
     CommandHandler(Message message) {
-        CommandHandler.message = message;
         parseCommand(message);
     }
 
@@ -29,9 +29,12 @@ class CommandHandler {
      * @param message The message to be parsed.
      */
     private void parseCommand(Message message) {
-        String[] tokenizedString = message.getContent().split("\\s+");
-        rootCommand = tokenizedString[0].substring(1);
-        modifiers = Arrays.copyOfRange(tokenizedString, 1, tokenizedString.length);
+        CommandHandler.message = message;
+        String messageString = message.getContent().replaceFirst(prompt, "");
+        String[] tokenizedMessageString = messageString.split("\\s+");
+        rootCommand = tokenizedMessageString[0];
+        query = messageString.replaceFirst(rootCommand + " ", "");
+        modifiers = Arrays.copyOfRange(tokenizedMessageString, 1, tokenizedMessageString.length);
     }
 
     /**
@@ -54,11 +57,23 @@ class CommandHandler {
     }
 
     /**
+     * This line of code was getting repeated a lot, so I threw it in its own method.
+     * @param response The content to be included in the method
+     * @return Message to be posted in Discord.
+     */
+    public static Mono<Message> respondWith(String response) {
+        return message.getChannel().flatMap(channel -> channel.createMessage(response));
+    }
+    public static Mono<Message> respondWith(EmbedCreateSpec response) {
+        return message.getChannel().flatMap(channel -> channel.createMessage(response));
+    }
+
+    /**
      * Simple ping command.
      * @return Pong!
      */
     private static Mono<Message> ping() {
-        return message.getChannel().flatMap(channel -> channel.createMessage("pong!"));
+        return respondWith("pong!");
     }
 
     /**
@@ -66,7 +81,7 @@ class CommandHandler {
      * @return cold_face emoji
      */
     private static Mono<Message> bingChilling() {
-        return message.getChannel().flatMap(channel -> channel.createMessage(":cold_face:"));
+        return respondWith(":cold_face:");
     }
 
     /**
@@ -74,10 +89,7 @@ class CommandHandler {
      * @return Image related to user's query
      */
     private static Mono<Message> img() {
-        String searchQuery = message.getContent().substring(rootCommand.length() + 2);
-        //WebSearch webSearch = new WebSearch('I', searchQuery);
-        String result = WebSearch.getImage(searchQuery);
-        return message.getChannel().flatMap(channel -> channel.createMessage(result));
+        return respondWith(WebSearch.getImage(query));
     }
 
     /**
@@ -85,8 +97,7 @@ class CommandHandler {
      * @return Gif related to user's query
      */
     private static Mono<Message> gif() {
-        String searchQuery = message.getContent().substring(rootCommand.length() + 2);
-        return message.getChannel().flatMap(channel -> channel.createMessage(GiphySearch.getGif(searchQuery)));
+        return respondWith(GiphySearch.getGif(query));
     }
 
     /**
@@ -94,17 +105,20 @@ class CommandHandler {
      * @return A message containing an embedded search result.
      */
     private static Mono<Message> bing() {
-        String searchQuery = message.getContent().substring(rootCommand.length() + 2);
-        //WebSearch webSearch = new WebSearch('W', searchQuery);
-        JsonObject webpage = WebSearch.getWebPage(searchQuery);
-        assert webpage != null;
-        EmbedCreateSpec embed = EmbedCreateSpec.builder()
-                .color(Color.HOKI)
-                .thumbnail(WebSearch.getImage(searchQuery))
-                .description(webpage.get("snippet").getAsString())
-                .title(webpage.get("name").getAsString())
-                .url(webpage.get("url").getAsString())
-                .build();
-        return message.getChannel().flatMap(channel -> channel.createMessage(embed));
+        JsonObject webpage = WebSearch.getWebPage(query);
+        // Builds an embed with properties of the webpage.
+        EmbedCreateSpec embed = null;
+        if (webpage != null) {
+            embed = EmbedCreateSpec.builder()
+                    .color(Color.HOKI)
+                    .thumbnail(WebSearch.getImage(query))
+                    .description(webpage.get("snippet").getAsString())
+                    .title(webpage.get("name").getAsString())
+                    .url(webpage.get("url").getAsString())
+                    .build();
+        } else {
+            respondWith("Something went wrong");
+        }
+        return respondWith(embed);
     }
 }

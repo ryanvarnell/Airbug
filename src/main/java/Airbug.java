@@ -12,6 +12,8 @@ public class Airbug {
     // Instantiate a DiscordClient using bot token.
     private static final String discordToken = System.getenv("AIRBUG_TOKEN");
     private static final DiscordClient client = DiscordClient.create(discordToken);
+    // Anything here will work as a prompt.
+    public static final String commandPrompt = "-";
 
     /**
      * Main loop
@@ -21,10 +23,9 @@ public class Airbug {
             // Check messages for command prompt
             return gateway.on(MessageCreateEvent.class, event -> {
                 Message message = event.getMessage();
-
                 // If the user's message begins with the command prompt, open a new CommandHandler and send it the
                 // message to be processed.
-                if (message.getContent().charAt(0) == '-') {
+                if (message.getContent().startsWith(commandPrompt)) {
                     new CommandHandler(message);
                     return CommandHandler.process();
                 }
