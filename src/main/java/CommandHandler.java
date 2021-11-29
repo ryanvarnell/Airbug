@@ -89,7 +89,7 @@ class CommandHandler {
      * @return Image related to user's query
      */
     private static Mono<Message> img() {
-        return respondWith(WebSearch.getImage(query));
+        return respondWith(BingSearch.getImage(query));
     }
 
     /**
@@ -105,13 +105,13 @@ class CommandHandler {
      * @return A message containing an embedded search result.
      */
     private static Mono<Message> bing() {
-        JsonObject webpage = WebSearch.getWebPage(query);
+        JsonObject webpage = BingSearch.getWebPage(query);
         // Builds an embed with properties of the webpage.
         EmbedCreateSpec embed = null;
         if (webpage != null) {
             embed = EmbedCreateSpec.builder()
                     .color(Color.HOKI)
-                    .thumbnail(WebSearch.getImage(query))
+                    .thumbnail(BingSearch.getImage(query))
                     .description(webpage.get("snippet").getAsString())
                     .title(webpage.get("name").getAsString())
                     .url(webpage.get("url").getAsString())

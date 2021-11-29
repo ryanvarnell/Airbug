@@ -18,7 +18,7 @@ import java.util.Scanner;
  * API lmao
  * @author Ryan Varnell.
  */
-public class WebSearch {
+public class BingSearch {
     private final static String subscriptionKey = System.getenv("BING_SEARCH_KEY");
     private final static String host = "https://api.bing.microsoft.com";
 
