@@ -26,6 +26,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.trievosoftware/giphy4j
     implementation 'com.trievosoftware:giphy4j:1.0.0'
+
+    // https://mvnrepository.com/artifact/com.kttdevelopment/mal4j
+    implementation 'com.kttdevelopment:mal4j:2.6.0'
 }
 
 test {

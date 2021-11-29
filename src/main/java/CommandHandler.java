@@ -1,4 +1,5 @@
 import com.google.gson.JsonObject;
+import com.kttdevelopment.mal4j.anime.Anime;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -6,6 +7,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -43,6 +45,7 @@ public class CommandHandler {
             case "image", "img" -> { return img(); }
             case "giphy", "gif" -> { return gif(); }
             case "wiki", "w" -> { return wiki(); }
+            case "anime", "a" -> { return anime(); }
             default -> { return null; }
         }
     }
@@ -130,8 +133,10 @@ public class CommandHandler {
         EmbedCreateSpec embed = null;
         if (webpage != null) {
             embed = EmbedCreateSpec.builder()
-                    .color(Color.HOKI)
-                    .thumbnail(BingSearch.getImage(query))
+                    .color(Color.ENDEAVOUR).author("Bing",
+                            "https://www.bing.com/",
+                            "https://vignette2.wikia.nocookie.net/logopedia/images/0/09/Bing-2.png/revision/latest/scale-to-width-down/220?cb=20160504230420")
+                    .thumbnail(BingSearch.getImage(webpage.get("name").getAsString()))
                     .description(webpage.get("snippet").getAsString())
                     .title(webpage.get("name").getAsString())
                     .url(webpage.get("url").getAsString())
@@ -147,23 +152,40 @@ public class CommandHandler {
      * @return Embedded wiki result.
      */
     private static Mono<Message> wiki() {
-        JsonObject webpage = BingSearch.getWebPage(query + " wiki");
+        JsonObject webpage = BingSearch.getWebPage(query + " wikipedia");
         // Builds an embed with properties of the webpage.
         EmbedCreateSpec embed = null;
         System.out.println(webpage);
-        if (webpage != null) {
+        if (webpage != null && webpage.get("url").getAsString().contains("wikipedia")) {
             embed = EmbedCreateSpec.builder()
-                    .color(Color.DEEP_LILAC).author("Wikipedia, the Free Encyclopedia",
+                    .color(Color.WHITE).author("Wikipedia",
                             "https://en.wikipedia.org/wiki/Main_Page",
-                            "https://www.famouslogos.org/wp-content/uploads/2009/04/wikipediafav.png")
-                    .thumbnail(BingSearch.getImage(webpage.get("name").getAsString() + " logo"))
+                            "https://cdn.freebiesupply.com/images/large/2x/wikipedia-logo-transparent.png")
+                    .thumbnail(BingSearch.getImage(query + " wikipedia"))
                     .description(webpage.get("snippet").getAsString())
                     .title(webpage.get("name").getAsString())
                     .url(webpage.get("url").getAsString())
                     .build();
         } else {
-            respondWith("Something went wrong");
+            respondWith("No luck");
         }
+        return respondWith(embed);
+    }
+
+    private static Mono<Message> anime() {
+        Anime anime = MalSearch.searchAnime(query);
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.DEEP_LILAC)
+                .author("MyAnimeList",
+                        "https://myanimelist.net/",
+                        "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
+                .thumbnail(anime.getMainPicture().getLargeURL())
+                .title(anime.getTitle())
+                .description(anime.getSynopsis())
+                .addField("Mean rating:", String.valueOf(anime.getMeanRating()), false)
+                .image(String.valueOf(anime.getPictures()[0]))
+                .timestamp(Instant.now())
+                .build();
         return respondWith(embed);
     }
 }

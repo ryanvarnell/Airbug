@@ -3,4 +3,4 @@ ping    ~>  pong
 bing    ~>  web search
 image   ~>  image search
 giphy   ~>  gif search
-wiki    ~>  will (hopefully) search wikipedia.
+wiki    ~>  wikipedia search
