@@ -31,8 +31,8 @@ public class CommandHandler {
     public static Mono<Message> process(Message message) {
         parseCommand(message);
         switch (rootCommand) {
-            case "ping", "p" -> { return ping(); }
-            case "help", "h" -> { return help(); }
+            case "ping", "p" -> {return ping();}
+            case "help", "h" -> {return help();}
             case "bing", "b",
                     "google", "g",
                     "duckduckgo", "ddg",
@@ -43,12 +43,13 @@ public class CommandHandler {
                 else
                     return bing();
             }
-            case "image", "img" -> { return img(); }
-            case "giphy", "gif" -> { return gif(); }
-            case "wiki", "w" -> { return wiki(); }
-            case "anime", "a" -> { return anime(); }
-            case "manga", "m" -> { return manga(); }
-            case "cowsay", "cs" -> { return cowsay(); }
+            case "image", "img" -> {return img();}
+            case "giphy", "gif" -> {return gif();}
+            case "wiki", "w" -> {return wiki();}
+            case "anime", "a" -> {return anime(); }
+            case "manga", "m" -> {return manga();}
+            case "cowsay", "cs" -> {return cowsay();}
+            case "cowthink", "ct" -> {return cowthink();}
             default -> { return null; }
         }
     }
@@ -227,5 +228,13 @@ public class CommandHandler {
      */
     private static Mono<Message> cowsay() {
         return respondWith("```\n" + Cowsay.say(new String[]{query}) + "\n```");
+    }
+
+    /**
+     * Cowthink
+     * @return Cowthink
+     */
+    private static Mono<Message> cowthink() {
+        return respondWith("```\n" + Cowsay.think(new String[]{query}) + "\n```");
     }
 }
