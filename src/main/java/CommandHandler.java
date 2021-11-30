@@ -152,7 +152,6 @@ public class CommandHandler {
                     .description(webpage.get("snippet").getAsString())
                     .title(webpage.get("name").getAsString())
                     .url(webpage.get("url").getAsString())
-                    .timestamp(Instant.now())
                     .build();
         } else {
             return respondWith("Something went wrong");
@@ -178,7 +177,6 @@ public class CommandHandler {
                     .description(webpage.get("snippet").getAsString())
                     .title(webpage.get("name").getAsString())
                     .url(webpage.get("url").getAsString())
-                    .timestamp(Instant.now())
                     .build();
         } else {
             return respondWith("No luck");
@@ -207,7 +205,6 @@ public class CommandHandler {
                     .addField(rec1.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
                     .addField(rec2.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
                     .addField(rec3.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                    .timestamp(Instant.now())
                     .build();
         } else {
             embed = EmbedCreateSpec.builder()
@@ -220,7 +217,6 @@ public class CommandHandler {
                             .replace("\\n", "")
                             .replace("[Written by MAL Rewrite]", ""))
                     .addField("Mean rating:", String.valueOf(anime.getMeanRating()), false)
-                    .timestamp(Instant.now())
                     .build();
         }
         return respondWith(embed);
@@ -243,7 +239,6 @@ public class CommandHandler {
                         .replace("\\n", "")
                         .replace("[Written by MAL Rewrite]", ""))
                 .addField("Mean rating:", String.valueOf(manga.getMeanRating()), false)
-                .timestamp(Instant.now())
                 .build();
         return respondWith(embed);
     }
