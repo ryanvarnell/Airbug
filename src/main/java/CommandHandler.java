@@ -2,9 +2,7 @@ import com.github.lalyos.jfiglet.FigletFont;
 import com.github.ricksbrown.cowsay.Cowsay;
 import com.google.gson.JsonObject;
 import com.kttdevelopment.mal4j.anime.Anime;
-import com.kttdevelopment.mal4j.anime.AnimeRecommendation;
 import com.kttdevelopment.mal4j.manga.Manga;
-import com.kttdevelopment.mal4j.manga.MangaRecommendation;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -14,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -37,12 +36,7 @@ public class CommandHandler {
         switch (rootCommand.toLowerCase()) {
             case "ping", "p" -> {return ping();}
             case "help", "h" -> {return help();}
-            case "bing", "b", "google", "g", "duckduckgo", "ddg", "askjeeves", "aj", "search" -> {
-                if (commands.get(0).equalsIgnoreCase("bing")
-                        && query.toString().equalsIgnoreCase("chilling"))
-                    return bingChilling();
-                else {return bing();}
-            }
+            case "bing", "b", "google", "g", "duckduckgo", "ddg", "askjeeves", "aj", "search" -> {return bing();}
             case "image", "img" -> {return img();}
             case "giphy", "gif" -> {return gif();}
             case "wiki", "w" -> {return wiki();}
@@ -51,6 +45,7 @@ public class CommandHandler {
             case "cowsay", "cs" -> {return cowsay();}
             case "cowthink", "ct" -> {return cowthink();}
             case "figlet" -> {return figlet();}
+            case "choose" -> {return choose();}
             default -> { return respondWith("unrecognized command"); }
         }
     }
@@ -146,6 +141,8 @@ public class CommandHandler {
      */
     private Mono<Message> bing() {
         parse();
+        if (query.toString().equalsIgnoreCase("chilling"))
+            return bingChilling();
         JsonObject webpage = BingSearch.getWebPage(query.toString());
         // Builds an embed with properties of the webpage.
         EmbedCreateSpec embed;
@@ -197,7 +194,6 @@ public class CommandHandler {
      */
     private Mono<Message> anime() {
         parse();
-        Anime anime = MalSearch.searchAnime(query.toString());
         EmbedCreateSpec embed;
         if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
             embed = MalSearch.getAnimeRecEmbed(query.toString());
@@ -213,7 +209,6 @@ public class CommandHandler {
      */
     private Mono<Message> manga() {
         parse();
-        Manga manga = MalSearch.searchManga(query.toString());
         EmbedCreateSpec embed;
         if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
             embed = MalSearch.getMangaRecEmbed(query.toString());
@@ -255,4 +250,15 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * Chooses a random result from options given by the user.
+     * @return Result of given options.
+     */
+    private Mono<Message> choose() {
+        parse();
+        String[] choices = query.toString().split(",");
+        Random random = new Random();
+        int randInt = random.nextInt(choices.length);
+        return respondWith(choices[randInt].trim());
+    }
 }

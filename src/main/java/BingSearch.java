@@ -62,7 +62,13 @@ public class BingSearch {
         // "value" is the resulting image data, and return the first image's thumbnailUrl.
         JsonObject resultsJson = JsonParser.parseString(results.jsonResponse).getAsJsonObject();
         JsonArray imagesJson = resultsJson.getAsJsonArray("value");
-        JsonObject searchResult = (JsonObject) imagesJson.get(0);
+        JsonObject searchResult;
+        try {
+            searchResult = (JsonObject) imagesJson.get(0);
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+            return "no results";
+        }
         return searchResult.get("thumbnailUrl").getAsString();
     }
 

@@ -4,6 +4,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Mono;
 
+import java.util.Random;
+
 /**
  * Simple, small-scale Discord bot using Discord4J
  * @author Ryan Varnell
@@ -28,6 +30,24 @@ public class Airbug {
                     if (message.getContent().startsWith(commandPrompt)) {
                         CommandHandler commandHandler = new CommandHandler();
                         return commandHandler.process(message);
+                    } else if (message.getContent().toLowerCase().contains("airbug-chan")) {
+                        Random random = new Random();
+                        int num = random.nextInt(10);
+                        String s;
+                        switch(num) {
+                            case 0 -> s = "★~(◠‿◕✿)";
+                            case 1 -> s = "★~(◡ω◕✿)";
+                            case 2 -> s = "★~(◡‿◡✿)";
+                            case 3 -> s = "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧";
+                            case 4 -> s = "(´｡• ω •｡`)";
+                            case 5 -> s = "(✿◠‿◠)";
+                            case 6 -> s = "ﾟ+.(*ﾉｪﾉ)ﾟ+";
+                            case 7 -> s = "( ͡°⁄ ⁄ ͜⁄ ⁄ʖ⁄ ⁄ ͡°)";
+                            case 8 -> s = "(´ε｀ )♡☆κｉss мё☆ﾟ";
+                            case 9 -> s = "ayo look at this mf lmao \"airbug-chan\" ass";
+                            default -> s = "huh";
+                        }
+                        return message.getChannel().flatMap(channel -> channel.createMessage(s));
                     }
                     return Mono.empty();
                 }));
