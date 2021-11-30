@@ -1,8 +1,8 @@
 help    ~>  this command
 ping    ~>  pong
 bing    ~>  web search
-image   ~>  image search
-giphy   ~>  gif search
+img     ~>  image search
+gif     ~>  gif search
 wiki    ~>  search wikipedia
 anime   ~>  search MAL database for anime
 manga   ~>  search MAL database for manga

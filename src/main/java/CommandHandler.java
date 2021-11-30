@@ -1,3 +1,4 @@
+import com.github.ricksbrown.cowsay.Cowsay;
 import com.google.gson.JsonObject;
 import com.kttdevelopment.mal4j.anime.Anime;
 import com.kttdevelopment.mal4j.manga.Manga;
@@ -29,7 +30,6 @@ public class CommandHandler {
      */
     public static Mono<Message> process(Message message) {
         parseCommand(message);
-
         switch (rootCommand) {
             case "ping", "p" -> { return ping(); }
             case "help", "h" -> { return help(); }
@@ -48,6 +48,7 @@ public class CommandHandler {
             case "wiki", "w" -> { return wiki(); }
             case "anime", "a" -> { return anime(); }
             case "manga", "m" -> { return manga(); }
+            case "cowsay", "cs" -> { return cowsay(); }
             default -> { return null; }
         }
     }
@@ -132,7 +133,7 @@ public class CommandHandler {
     private static Mono<Message> bing() {
         JsonObject webpage = BingSearch.getWebPage(query);
         // Builds an embed with properties of the webpage.
-        EmbedCreateSpec embed = null;
+        EmbedCreateSpec embed;
         if (webpage != null) {
             embed = EmbedCreateSpec.builder()
                     .color(Color.ENDEAVOUR).author("Bing",
@@ -145,7 +146,7 @@ public class CommandHandler {
                     .timestamp(Instant.now())
                     .build();
         } else {
-            respondWith("Something went wrong");
+            return respondWith("Something went wrong");
         }
         return respondWith(embed);
     }
@@ -157,7 +158,7 @@ public class CommandHandler {
     private static Mono<Message> wiki() {
         JsonObject webpage = BingSearch.getWebPage(query + " wikipedia");
         // Builds an embed with properties of the webpage.
-        EmbedCreateSpec embed = null;
+        EmbedCreateSpec embed;
         System.out.println(webpage);
         if (webpage != null && webpage.get("url").getAsString().contains("wikipedia")) {
             embed = EmbedCreateSpec.builder()
@@ -171,7 +172,7 @@ public class CommandHandler {
                     .timestamp(Instant.now())
                     .build();
         } else {
-            respondWith("No luck");
+            return respondWith("No luck");
         }
         return respondWith(embed);
     }
@@ -218,5 +219,13 @@ public class CommandHandler {
                 .timestamp(Instant.now())
                 .build();
         return respondWith(embed);
+    }
+
+    /**
+     * Cowsay
+     * @return Cowsay
+     */
+    private static Mono<Message> cowsay() {
+        return respondWith("```\n" + Cowsay.say(new String[]{query}) + "\n```");
     }
 }
