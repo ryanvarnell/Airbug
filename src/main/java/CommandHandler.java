@@ -4,7 +4,6 @@ import com.kttdevelopment.mal4j.anime.Anime;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
-import io.leego.banana.BananaUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
