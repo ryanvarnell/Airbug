@@ -2,7 +2,6 @@ import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
-import org.checkerframework.checker.units.qual.C;
 import reactor.core.publisher.Mono;
 
 /**

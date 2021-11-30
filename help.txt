@@ -1,11 +1,23 @@
-help        ~>  this command
-ping        ~>  pong
-bing        ~>  web search
-img         ~>  image search
-gif         ~>  gif search
-wiki        ~>  search wikipedia
-anime [-rec]~>  search MAL database for anime. -rec flag for recommendations
-manga       ~>  search MAL database for manga
-cowsay      ~>  cowsay
-cowthink    ~>  cowthink
-figlet      ~>  figlet
+help        ⟶  this command
+
+ping        ⟶  pong
+
+bing        ⟶  web search
+
+img         ⟶  image search
+
+gif         ⟶  gif search
+
+wiki        ⟶  search wikipedia
+
+anime       ⟶  search MAL database for anime.
+                ⮑[rec] provides recommendations.
+
+manga       ⟶  search MAL database for manga
+                ⮑[rec] provides recommendations.
+
+cowsay      ⟶  cowsay
+
+cowthink    ⟶  cowthink
+
+figlet      ⟶  figlet
