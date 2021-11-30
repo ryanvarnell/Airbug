@@ -2,6 +2,7 @@ import com.github.lalyos.jfiglet.FigletFont;
 import com.github.ricksbrown.cowsay.Cowsay;
 import com.google.gson.JsonObject;
 import com.kttdevelopment.mal4j.anime.Anime;
+import com.kttdevelopment.mal4j.anime.AnimeRecommendation;
 import com.kttdevelopment.mal4j.manga.Manga;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -12,7 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -21,18 +22,17 @@ import java.util.Scanner;
  */
 public class CommandHandler {
     private static final String prompt = Airbug.commandPrompt;
-    private static Message message;
-    private static String rootCommand;
-    private static String query;
-    private static String[] commands;
+    Message message;
+    StringBuilder query = new StringBuilder();
+    ArrayList<String> commands = new ArrayList<>();
 
     /**
      * Chooses which command to run based on the root command.
      * @return The result of the command ran.
      */
-    public static Mono<Message> process(Message message) {
+    public Mono<Message> process(Message message) {
         parseCommand(message);
-        switch (rootCommand) {
+        switch (commands.get(0).toLowerCase()) {
             case "ping", "p" -> {return ping();}
             case "help", "h" -> {return help();}
             case "bing", "b",
@@ -40,7 +40,7 @@ public class CommandHandler {
                     "duckduckgo", "ddg",
                     "askjeeves", "aj",
                     "search" -> {
-                if (rootCommand.equals("bing") && commands[0].equalsIgnoreCase("chilling"))
+                if (commands.get(0).equalsIgnoreCase("bing") && query.toString().equalsIgnoreCase("chilling"))
                     return bingChilling();
                 else
                     return bing();
@@ -61,13 +61,18 @@ public class CommandHandler {
      * Parses the command into more easily controllable formats.
      * @param message The message to be parsed.
      */
-    private static void parseCommand(Message message) {
-        CommandHandler.message = message;
-        String messageString = message.getContent().replaceFirst(prompt, "").toLowerCase();
-        String[] tokenizedMessageString = messageString.split("\\s+");
-        rootCommand = tokenizedMessageString[0];
-        query = messageString.replaceFirst(rootCommand + " ", "");
-        commands = Arrays.copyOfRange(tokenizedMessageString, 1, tokenizedMessageString.length);
+    private void parseCommand(Message message) {
+        this.message = message;
+        String[] tokenizedMessage = message.getContent().split("\\s+");
+        for (String s : tokenizedMessage) {
+            if (s.startsWith(prompt)) {
+                s = s.replace(prompt, "");
+                commands.add(s);
+            } else {
+                query.append(s).append(" ");
+            }
+        }
+        query = new StringBuilder(query.toString().trim());
     }
 
     /**
@@ -75,10 +80,10 @@ public class CommandHandler {
      * @param response The content to be included in the method
      * @return Message to be posted in Discord.
      */
-    public static Mono<Message> respondWith(String response) {
+    public Mono<Message> respondWith(String response) {
         return message.getChannel().flatMap(channel -> channel.createMessage(response));
     }
-    public static Mono<Message> respondWith(EmbedCreateSpec response) {
+    public Mono<Message> respondWith(EmbedCreateSpec response) {
         return message.getChannel().flatMap(channel -> channel.createMessage(response));
     }
 
@@ -86,11 +91,11 @@ public class CommandHandler {
      * Simple ping command.
      * @return Pong!
      */
-    private static Mono<Message> ping() {
+    private Mono<Message> ping() {
         return respondWith("pong!");
     }
 
-    private static Mono<Message> help() {
+    private Mono<Message> help() {
         Scanner scanner;
         try {
             scanner = new Scanner(new File("help.txt"));
@@ -110,7 +115,7 @@ public class CommandHandler {
      * Bing Chilling
      * @return cold_face emoji
      */
-    private static Mono<Message> bingChilling() {
+    private Mono<Message> bingChilling() {
         return respondWith(":cold_face:");
     }
 
@@ -118,24 +123,24 @@ public class CommandHandler {
      * Image search powered by Bing
      * @return Image related to user's query
      */
-    private static Mono<Message> img() {
-        return respondWith(BingSearch.getImage(query));
+    private Mono<Message> img() {
+        return respondWith(BingSearch.getImage(query.toString()));
     }
 
     /**
      * Gif search powered by Giphy
      * @return Gif related to user's query
      */
-    private static Mono<Message> gif() {
-        return respondWith(GiphySearch.getGif(query));
+    private Mono<Message> gif() {
+        return respondWith(GiphySearch.getGif(query.toString()));
     }
 
     /**
      * Web search command, uses Bing API.
      * @return A message containing an embedded search result.
      */
-    private static Mono<Message> bing() {
-        JsonObject webpage = BingSearch.getWebPage(query);
+    private Mono<Message> bing() {
+        JsonObject webpage = BingSearch.getWebPage(query.toString());
         // Builds an embed with properties of the webpage.
         EmbedCreateSpec embed;
         if (webpage != null) {
@@ -159,7 +164,7 @@ public class CommandHandler {
      * This a JANK wiki command, but it'll work for what I'm using it for.
      * @return Embedded wiki result.
      */
-    private static Mono<Message> wiki() {
+    private Mono<Message> wiki() {
         JsonObject webpage = BingSearch.getWebPage(query + " wikipedia");
         // Builds an embed with properties of the webpage.
         EmbedCreateSpec embed;
@@ -185,21 +190,40 @@ public class CommandHandler {
      * MyAnimeList anime search
      * @return Embedded anime related to query.
      */
-    private static Mono<Message> anime() {
-        Anime anime = MalSearch.searchAnime(query);
-        EmbedCreateSpec embed = EmbedCreateSpec.builder()
-                .color(Color.DEEP_LILAC)
-                .author("MyAnimeList",
-                        "https://myanimelist.net/",
-                        "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
-                .thumbnail(anime.getMainPicture().getLargeURL())
-                .title(anime.getTitle())
-                .description(anime.getSynopsis()
-                        .replace("\\n", "")
-                        .replace("[Written by MAL Rewrite]", ""))
-                .addField("Mean rating:", String.valueOf(anime.getMeanRating()), false)
-                .timestamp(Instant.now())
-                .build();
+    private Mono<Message> anime() {
+        Anime anime = MalSearch.searchAnime(query.toString());
+        EmbedCreateSpec embed;
+        if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
+            AnimeRecommendation[] recs = anime.getRecommendations();
+            Anime rec1 = recs[0].getAnime();
+            Anime rec2 = recs[1].getAnime();
+            Anime rec3 = recs[2].getAnime();
+            embed = EmbedCreateSpec.builder()
+                    .author("Recommendations based on:",
+                            "https://myanimelist.net/",
+                            "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
+                    .title(anime.getTitle())
+                    .thumbnail(anime.getMainPicture().getLargeURL())
+                    .addField(rec1.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
+                    .addField(rec2.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
+                    .addField(rec3.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
+                    .timestamp(Instant.now())
+                    .build();
+        } else {
+            embed = EmbedCreateSpec.builder()
+                    .color(Color.DEEP_LILAC)
+                    .author("MyAnimeList",
+                            "https://myanimelist.net/",
+                            "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
+                    .thumbnail(anime.getMainPicture().getLargeURL())
+                    .title(anime.getTitle())
+                    .description(anime.getSynopsis()
+                            .replace("\\n", "")
+                            .replace("[Written by MAL Rewrite]", ""))
+                    .addField("Mean rating:", String.valueOf(anime.getMeanRating()), false)
+                    .timestamp(Instant.now())
+                    .build();
+        }
         return respondWith(embed);
     }
 
@@ -207,8 +231,8 @@ public class CommandHandler {
      * MyAnimeList manga search
      * @return Embedded manga related to query.
      */
-    private static Mono<Message> manga() {
-        Manga manga = MalSearch.searchManga(query);
+    private Mono<Message> manga() {
+        Manga manga = MalSearch.searchManga(query.toString());
         EmbedCreateSpec embed = EmbedCreateSpec.builder()
                 .color(Color.HOKI)
                 .author("MyAnimeList",
@@ -229,28 +253,29 @@ public class CommandHandler {
      * Cowsay
      * @return Cowsay
      */
-    private static Mono<Message> cowsay() {
-        return respondWith("```\n" + Cowsay.say(new String[]{query}) + "\n```");
+    private Mono<Message> cowsay() {
+        return respondWith("```\n" + Cowsay.say(new String[]{query.toString()}) + "\n```");
     }
 
     /**
      * Cowthink
      * @return Cowthink
      */
-    private static Mono<Message> cowthink() {
-        return respondWith("```\n" + Cowsay.think(new String[]{query}) + "\n```");
+    private Mono<Message> cowthink() {
+        return respondWith("```\n" + Cowsay.think(new String[]{query.toString()}) + "\n```");
     }
 
     /**
      * Figlet
      * @return Figlet
      */
-    private static Mono<Message> figlet() {
+    private Mono<Message> figlet() {
         try {
-            return respondWith("```\n" + FigletFont.convertOneLine(query) + "\n```");
+            return respondWith("```\n" + FigletFont.convertOneLine(query.toString()) + "\n```");
         } catch (IOException e) {
             e.printStackTrace();
             return respondWith("something went wrong");
         }
     }
+
 }

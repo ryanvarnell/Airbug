@@ -2,6 +2,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
+import org.checkerframework.checker.units.qual.C;
 import reactor.core.publisher.Mono;
 
 /**
@@ -26,7 +27,8 @@ public class Airbug {
                     // If the user's message begins with the command prompt, open a new CommandHandler and send it the
                     // message to be processed.
                     if (message.getContent().startsWith(commandPrompt)) {
-                        return CommandHandler.process(message);
+                        CommandHandler commandHandler = new CommandHandler();
+                        return commandHandler.process(message);
                     }
                     return Mono.empty();
                 }));
