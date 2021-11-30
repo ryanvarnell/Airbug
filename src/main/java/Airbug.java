@@ -26,7 +26,9 @@ public class Airbug {
                     // If the user's message begins with the command prompt, open a new CommandHandler and send it the
                     // message to be processed.
                     if (message.getContent().startsWith(commandPrompt)) {
-                        return CommandHandler.process(message);
+                        Mono<Message> response = CommandHandler.process(message);
+                        message.delete();
+                        return response;
                     }
                     return Mono.empty();
                 }));

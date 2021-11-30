@@ -143,6 +143,7 @@ public class CommandHandler {
                     .description(webpage.get("snippet").getAsString())
                     .title(webpage.get("name").getAsString())
                     .url(webpage.get("url").getAsString())
+                    .timestamp(Instant.now())
                     .build();
         } else {
             respondWith("Something went wrong");
@@ -168,6 +169,7 @@ public class CommandHandler {
                     .description(webpage.get("snippet").getAsString())
                     .title(webpage.get("name").getAsString())
                     .url(webpage.get("url").getAsString())
+                    .timestamp(Instant.now())
                     .build();
         } else {
             respondWith("No luck");
