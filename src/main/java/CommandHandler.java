@@ -1,6 +1,6 @@
-import com.github.ricksbrown.cowsay.Cowsay;
 import com.google.gson.JsonObject;
 import com.kttdevelopment.mal4j.anime.Anime;
+import com.kttdevelopment.mal4j.manga.Manga;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -21,7 +21,7 @@ public class CommandHandler {
     private static Message message;
     private static String rootCommand;
     private static String query;
-    private static String[] modifiers;
+    private static String[] commands;
 
     /**
      * Chooses which command to run based on the root command.
@@ -38,7 +38,7 @@ public class CommandHandler {
                     "duckduckgo", "ddg",
                     "askjeeves", "aj",
                     "search" -> {
-                if (rootCommand.equals("bing") && modifiers[0].equalsIgnoreCase("chilling"))
+                if (rootCommand.equals("bing") && commands[0].equalsIgnoreCase("chilling"))
                     return bingChilling();
                 else
                     return bing();
@@ -47,8 +47,7 @@ public class CommandHandler {
             case "giphy", "gif" -> { return gif(); }
             case "wiki", "w" -> { return wiki(); }
             case "anime", "a" -> { return anime(); }
-            case "cowsay" -> { return cowsay(); }
-            case "cowthink" -> { return cowthink(); }
+            case "manga", "m" -> { return manga(); }
             default -> { return null; }
         }
     }
@@ -63,7 +62,7 @@ public class CommandHandler {
         String[] tokenizedMessageString = messageString.split("\\s+");
         rootCommand = tokenizedMessageString[0];
         query = messageString.replaceFirst(rootCommand + " ", "");
-        modifiers = Arrays.copyOfRange(tokenizedMessageString, 1, tokenizedMessageString.length);
+        commands = Arrays.copyOfRange(tokenizedMessageString, 1, tokenizedMessageString.length);
     }
 
     /**
@@ -177,6 +176,10 @@ public class CommandHandler {
         return respondWith(embed);
     }
 
+    /**
+     * MyAnimeList anime search
+     * @return Embedded anime related to query.
+     */
     private static Mono<Message> anime() {
         Anime anime = MalSearch.searchAnime(query);
         EmbedCreateSpec embed = EmbedCreateSpec.builder()
@@ -186,19 +189,34 @@ public class CommandHandler {
                         "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
                 .thumbnail(anime.getMainPicture().getLargeURL())
                 .title(anime.getTitle())
-                .description(anime.getSynopsis())
+                .description(anime.getSynopsis()
+                        .replace("\\n", "")
+                        .replace("[Written by MAL Rewrite]", ""))
                 .addField("Mean rating:", String.valueOf(anime.getMeanRating()), false)
-                .image(String.valueOf(anime.getPictures()[0]))
                 .timestamp(Instant.now())
                 .build();
         return respondWith(embed);
     }
 
-    private static Mono<Message> cowsay() {
-        return respondWith("```\n" + Cowsay.say(new String[]{query}) + "\n```");
-    }
-
-    private static Mono<Message> cowthink() {
-        return respondWith("```\n" + Cowsay.think(new String[]{query}) + "\n```");
+    /**
+     * MyAnimeList manga search
+     * @return Embedded manga related to query.
+     */
+    private static Mono<Message> manga() {
+        Manga manga = MalSearch.searchManga(query);
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.HOKI)
+                .author("MyAnimeList",
+                        "https://myanimelist.net/",
+                        "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
+                .thumbnail(manga.getMainPicture().getLargeURL())
+                .title(manga.getTitle())
+                .description(manga.getSynopsis()
+                        .replace("\\n", "")
+                        .replace("[Written by MAL Rewrite]", ""))
+                .addField("Mean rating:", String.valueOf(manga.getMeanRating()), false)
+                .timestamp(Instant.now())
+                .build();
+        return respondWith(embed);
     }
 }

@@ -3,4 +3,6 @@ ping    ~>  pong
 bing    ~>  web search
 image   ~>  image search
 giphy   ~>  gif search
-wiki    ~>  wikipedia search
+wiki    ~>  search wikipedia
+anime   ~>  search MAL database for anime
+manga   ~>  search MAL database for manga
