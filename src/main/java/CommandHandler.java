@@ -94,6 +94,10 @@ public class CommandHandler {
         return respondWith("pong!");
     }
 
+    /**
+     * Sends a list of commands stored in help.txt
+     * @return A message containing a list of commands.
+     */
     private Mono<Message> help() {
         Scanner scanner;
         try {
@@ -196,32 +200,9 @@ public class CommandHandler {
         Anime anime = MalSearch.searchAnime(query.toString());
         EmbedCreateSpec embed;
         if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
-            AnimeRecommendation[] recs = anime.getRecommendations();
-            Anime rec1 = recs[0].getAnime();
-            Anime rec2 = recs[1].getAnime();
-            Anime rec3 = recs[2].getAnime();
-            embed = EmbedCreateSpec.builder()
-                    .author("Recommendations based on:",
-                            "https://myanimelist.net/",
-                            "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
-                    .title(anime.getTitle())
-                    .thumbnail(anime.getMainPicture().getLargeURL())
-                    .addField(rec1.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                    .addField(rec2.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                    .addField(rec3.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                    .build();
+            embed = MalSearch.getAnimeRecEmbed(query.toString());
         } else {
-            embed = EmbedCreateSpec.builder()
-                    .author("MyAnimeList",
-                            "https://myanimelist.net/",
-                            "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
-                    .thumbnail(anime.getMainPicture().getLargeURL())
-                    .title(anime.getTitle())
-                    .description(anime.getSynopsis()
-                            .replace("\\n", "")
-                            .replace("[Written by MAL Rewrite]", ""))
-                    .addField("Mean rating:", String.valueOf(anime.getMeanRating()), false)
-                    .build();
+            embed = MalSearch.getAnimeEmbed(query.toString());
         }
         return respondWith(embed);
     }
@@ -235,32 +216,9 @@ public class CommandHandler {
         Manga manga = MalSearch.searchManga(query.toString());
         EmbedCreateSpec embed;
         if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
-            MangaRecommendation[] recs = manga.getRecommendations();
-            Manga rec1 = recs[0].getManga();
-            Manga rec2 = recs[1].getManga();
-            Manga rec3 = recs[2].getManga();
-            embed = EmbedCreateSpec.builder()
-                    .author("Recommendations based on:",
-                            "https://myanimelist.net/",
-                            "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
-                    .title(manga.getTitle())
-                    .thumbnail(manga.getMainPicture().getLargeURL())
-                    .addField(rec1.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                    .addField(rec2.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                    .addField(rec3.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                    .build();
+            embed = MalSearch.getMangaRecEmbed(query.toString());
         } else {
-            embed = EmbedCreateSpec.builder()
-                    .author("MyAnimeList",
-                            "https://myanimelist.net/",
-                            "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
-                    .thumbnail(manga.getMainPicture().getLargeURL())
-                    .title(manga.getTitle())
-                    .description(manga.getSynopsis()
-                            .replace("\\n", "")
-                            .replace("[Written by MAL Rewrite]", ""))
-                    .addField("Mean rating:", String.valueOf(manga.getMeanRating()), false)
-                    .build();
+            embed = MalSearch.getMangaEmbed(query.toString());
         }
         return respondWith(embed);
     }
