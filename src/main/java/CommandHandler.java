@@ -1,3 +1,4 @@
+import com.github.lalyos.jfiglet.FigletFont;
 import com.github.ricksbrown.cowsay.Cowsay;
 import com.google.gson.JsonObject;
 import com.kttdevelopment.mal4j.anime.Anime;
@@ -9,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -50,6 +52,7 @@ public class CommandHandler {
             case "manga", "m" -> {return manga();}
             case "cowsay", "cs" -> {return cowsay();}
             case "cowthink", "ct" -> {return cowthink();}
+            case "figlet" -> {return figlet();}
             default -> { return null; }
         }
     }
@@ -236,5 +239,18 @@ public class CommandHandler {
      */
     private static Mono<Message> cowthink() {
         return respondWith("```\n" + Cowsay.think(new String[]{query}) + "\n```");
+    }
+
+    /**
+     * Figlet
+     * @return Figlet
+     */
+    private static Mono<Message> figlet() {
+        try {
+            return respondWith("```\n" + FigletFont.convertOneLine(query) + "\n```");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return respondWith("something went wrong");
+        }
     }
 }

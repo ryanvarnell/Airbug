@@ -32,6 +32,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.github.ricksbrown/cowsay
     implementation 'com.github.ricksbrown:cowsay:1.1.0'
+
+    // https://github.com/lalyos/jfiglet
+    implementation 'com.github.lalyos:jfiglet:0.0.8'
 }
 
 test {
