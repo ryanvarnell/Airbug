@@ -4,7 +4,7 @@ bing        ~>  web search
 img         ~>  image search
 gif         ~>  gif search
 wiki        ~>  search wikipedia
-anime       ~>  search MAL database for anime
+anime [-rec]~>  search MAL database for anime. -rec flag for recommendations
 manga       ~>  search MAL database for manga
 cowsay      ~>  cowsay
 cowthink    ~>  cowthink

@@ -211,7 +211,6 @@ public class CommandHandler {
                     .build();
         } else {
             embed = EmbedCreateSpec.builder()
-                    .color(Color.DEEP_LILAC)
                     .author("MyAnimeList",
                             "https://myanimelist.net/",
                             "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
