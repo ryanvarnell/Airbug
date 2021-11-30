@@ -29,6 +29,12 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.kttdevelopment/mal4j
     implementation 'com.kttdevelopment:mal4j:2.6.0'
+
+    // https://mvnrepository.com/artifact/com.github.ricksbrown/cowsay
+    implementation 'com.github.ricksbrown:cowsay:1.1.0'
+
+    // https://mvnrepository.com/artifact/io.leego/banana
+    implementation 'io.leego:banana:2.1.0'
 }
 
 test {

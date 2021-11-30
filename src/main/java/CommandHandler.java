@@ -1,8 +1,10 @@
+import com.github.ricksbrown.cowsay.Cowsay;
 import com.google.gson.JsonObject;
 import com.kttdevelopment.mal4j.anime.Anime;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+import io.leego.banana.BananaUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -46,6 +48,8 @@ public class CommandHandler {
             case "giphy", "gif" -> { return gif(); }
             case "wiki", "w" -> { return wiki(); }
             case "anime", "a" -> { return anime(); }
+            case "cowsay" -> { return cowsay(); }
+            case "cowthink" -> { return cowthink(); }
             default -> { return null; }
         }
     }
@@ -187,5 +191,13 @@ public class CommandHandler {
                 .timestamp(Instant.now())
                 .build();
         return respondWith(embed);
+    }
+
+    private static Mono<Message> cowsay() {
+        return respondWith("```\n" + Cowsay.say(new String[]{query}) + "\n```");
+    }
+
+    private static Mono<Message> cowthink() {
+        return respondWith("```\n" + Cowsay.think(new String[]{query}) + "\n```");
     }
 }
