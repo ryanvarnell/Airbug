@@ -1,6 +1,8 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Color;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -100,6 +102,56 @@ public class BingSearch {
         }
         stream.close();
         return results;
+    }
+
+    /**
+     * Formats the webpage in a pretty embedded object
+     * @param query Search query
+     * @return Embedded webpage object
+     */
+    public static EmbedCreateSpec getWebpageEmbed(String query) {
+        JsonObject webpage = getWebPage(query);
+        if (webpage != null) {
+            return EmbedCreateSpec.builder()
+                    .color(Color.LIGHT_SEA_GREEN).author("Bing",
+                            "https://www.bing.com/",
+                            "https://vignette2.wikia.nocookie.net/logopedia/images/0/09/Bing-2.png/revision/latest/scale-to-width-down/220?cb=20160504230420")
+                    .thumbnail(BingSearch.getImage(webpage.get("name").getAsString()))
+                    .description(webpage.get("snippet").getAsString())
+                    .title(webpage.get("name").getAsString())
+                    .url(webpage.get("url").getAsString())
+                    .build();
+        } else {
+            return null;
+        }
+    }
+}
+
+/**
+ * Web search but more strict in that it restricts it to Wikipedia, but it's not a great solution. Works for now.
+ */
+class WikiSearch {
+
+    /**
+     * Returns the wiki page in a pretty embedded object
+     * @param query Search query
+     * @return Embedded wiki object.
+     */
+    public static EmbedCreateSpec getWikiEmbed(String query) {
+        JsonObject webpage = BingSearch.getWebPage(query);
+        if (webpage != null && webpage.get("url").getAsString().contains("wikipedia")) {
+            return EmbedCreateSpec.builder()
+                    .color(Color.WHITE).author("Wikipedia",
+                            "https://en.wikipedia.org/wiki/Main_Page",
+                            "https://cdn.freebiesupply.com/images/large/2x/wikipedia-logo-transparent.png")
+                    .thumbnail(BingSearch.getImage(query + " wikipedia"))
+                    .description(webpage.get("snippet").getAsString())
+                    .title(webpage.get("name").getAsString())
+                    .url(webpage.get("url").getAsString())
+                    .build();
+        } else {
+            return null;
+        }
     }
 }
 

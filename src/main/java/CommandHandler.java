@@ -1,11 +1,7 @@
 import com.github.lalyos.jfiglet.FigletFont;
 import com.github.ricksbrown.cowsay.Cowsay;
-import com.google.gson.JsonObject;
-import com.kttdevelopment.mal4j.anime.Anime;
-import com.kttdevelopment.mal4j.manga.Manga;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -75,10 +71,16 @@ public class CommandHandler {
      * @return Message to be posted in Discord.
      */
     private Mono<Message> respondWith(String response) {
-        return message.getChannel().flatMap(channel -> channel.createMessage(response));
+        if (response == null || response.isEmpty())
+            return message.getChannel().flatMap(channel -> channel.createMessage("something went wrong."));
+        else
+            return message.getChannel().flatMap(channel -> channel.createMessage(response));
     }
     private Mono<Message> respondWith(EmbedCreateSpec response) {
-        return message.getChannel().flatMap(channel -> channel.createMessage(response));
+        if (response == null)
+            return message.getChannel().flatMap(channel -> channel.createMessage("something went wrong."));
+        else
+            return message.getChannel().flatMap(channel -> channel.createMessage(response));
     }
 
     /**
@@ -141,25 +143,10 @@ public class CommandHandler {
      */
     private Mono<Message> bing() {
         parse();
-        if (query.toString().equalsIgnoreCase("chilling"))
+        if (commands.get(0).equalsIgnoreCase("bing")
+                && query.toString().equalsIgnoreCase("chilling"))
             return bingChilling();
-        JsonObject webpage = BingSearch.getWebPage(query.toString());
-        // Builds an embed with properties of the webpage.
-        EmbedCreateSpec embed;
-        if (webpage != null) {
-            embed = EmbedCreateSpec.builder()
-                    .color(Color.ENDEAVOUR).author("Bing",
-                            "https://www.bing.com/",
-                            "https://vignette2.wikia.nocookie.net/logopedia/images/0/09/Bing-2.png/revision/latest/scale-to-width-down/220?cb=20160504230420")
-                    .thumbnail(BingSearch.getImage(webpage.get("name").getAsString()))
-                    .description(webpage.get("snippet").getAsString())
-                    .title(webpage.get("name").getAsString())
-                    .url(webpage.get("url").getAsString())
-                    .build();
-        } else {
-            return respondWith("Something went wrong");
-        }
-        return respondWith(embed);
+        return respondWith(BingSearch.getWebpageEmbed(query.toString()));
     }
 
     /**
@@ -168,24 +155,7 @@ public class CommandHandler {
      */
     private Mono<Message> wiki() {
         parse();
-        JsonObject webpage = BingSearch.getWebPage(query + " wikipedia");
-        // Builds an embed with properties of the webpage.
-        EmbedCreateSpec embed;
-        System.out.println(webpage);
-        if (webpage != null && webpage.get("url").getAsString().contains("wikipedia")) {
-            embed = EmbedCreateSpec.builder()
-                    .color(Color.WHITE).author("Wikipedia",
-                            "https://en.wikipedia.org/wiki/Main_Page",
-                            "https://cdn.freebiesupply.com/images/large/2x/wikipedia-logo-transparent.png")
-                    .thumbnail(BingSearch.getImage(query + " wikipedia"))
-                    .description(webpage.get("snippet").getAsString())
-                    .title(webpage.get("name").getAsString())
-                    .url(webpage.get("url").getAsString())
-                    .build();
-        } else {
-            return respondWith("No luck");
-        }
-        return respondWith(embed);
+        return respondWith(WikiSearch.getWikiEmbed(query + " wikipedia"));
     }
 
     /**

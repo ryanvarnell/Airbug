@@ -21,3 +21,5 @@ cowsay      ⟶  cowsay
 cowthink    ⟶  cowthink
 
 figlet      ⟶  figlet
+
+choose      ⟶  choose a random thing
