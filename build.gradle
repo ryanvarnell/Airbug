@@ -8,6 +8,9 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
@@ -35,6 +38,8 @@ dependencies {
 
     // https://github.com/lalyos/jfiglet
     implementation 'com.github.lalyos:jfiglet:0.0.8'
+
+    implementation name: 'YouTubeSearchApi'
 }
 
 test {

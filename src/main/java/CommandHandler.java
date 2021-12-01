@@ -43,6 +43,7 @@ public class CommandHandler {
             case "figlet" -> {return figlet();}
             case "choose" -> {return choose();}
             case "8ball" -> {return eightBall();}
+            case "youtube", "yt" -> {return youtube();}
             default -> { return respondWith("unrecognized command"); }
         }
     }
@@ -280,5 +281,14 @@ public class CommandHandler {
             default -> s = "something went wrong";
         }
         return respondWith(s);
+    }
+
+    /**
+     * YouTube search
+     * @return YouTube video link
+     */
+    private Mono<Message> youtube() {
+        parse();
+        return respondWith(YouTubeSearch.getVideo(query.toString()));
     }
 }

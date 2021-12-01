@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="YouTubeSearchApi">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/YouTubeSearchApi.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
