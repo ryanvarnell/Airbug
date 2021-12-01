@@ -42,6 +42,7 @@ public class CommandHandler {
             case "cowthink", "ct" -> {return cowthink();}
             case "figlet" -> {return figlet();}
             case "choose" -> {return choose();}
+            case "8ball" -> {return eightBall();}
             default -> { return respondWith("unrecognized command"); }
         }
     }
@@ -230,5 +231,54 @@ public class CommandHandler {
         Random random = new Random();
         int randInt = random.nextInt(choices.length);
         return respondWith(choices[randInt].trim());
+    }
+
+    /**
+     * 8ball command
+     * @return A positive, neutral, or pessimistic response.
+     */
+    private Mono<Message> eightBall() {
+        Random random = new Random();
+        int num = random.nextInt(3);
+        String s = "";
+        switch(num) {
+            case 0 -> {
+                num = random.nextInt(10);
+                switch (num) {
+                    case 0 -> s = "yeah probably";
+                    case 1 -> s = "def";
+                    case 2 -> s = "for SURE";
+                    case 3 -> s = "yeah";
+                    case 4 -> s = "of course :)";
+                    case 5 -> s = "I don't see why not";
+                    case 6 -> s = "most likely";
+                    case 7 -> s = "8-ball says... :flushed:";
+                    case 8 -> s = "sure";
+                    case 9 -> s = ":triumph::triumph::triumph::triumph::triumph: yea";
+                }
+            }
+            case 1 -> {
+                num = random.nextInt(5);
+                switch (num) {
+                    case 0 -> s = "idk";
+                    case 1 -> s = "sky looks a little cloudy, hard 2 say";
+                    case 2 -> s = "can't say for sure";
+                    case 3 -> s = "im sorry what";
+                    case 4 -> s = "best not said out loud i think";
+                }
+            }
+            case 2 -> {
+                num = random.nextInt(5);
+                switch (num) {
+                    case 0 -> s = "ain't lookin too hot buddy";
+                    case 1 -> s = "yikes";
+                    case 2 -> s = "big no";
+                    case 3 -> s = "absolutely not";
+                    case 4 -> s = "lol no";
+                }
+            }
+            default -> s = "something went wrong";
+        }
+        return respondWith(s);
     }
 }

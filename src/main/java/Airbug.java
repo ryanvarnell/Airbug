@@ -44,7 +44,7 @@ public class Airbug {
                             case 6 -> s = "ﾟ+.(*ﾉｪﾉ)ﾟ+";
                             case 7 -> s = "( ͡°⁄ ⁄ ͜⁄ ⁄ʖ⁄ ⁄ ͡°)";
                             case 8 -> s = "(´ε｀ )♡☆κｉss мё☆ﾟ";
-                            case 9 -> s = "ayo look at this mf lmao \"airbug-chan\" ass";
+                            case 9 -> s = "ayo look at this mf lmao *\"airbug-chan\"* ass";
                             default -> s = "huh";
                         }
                         return message.getChannel().flatMap(channel -> channel.createMessage(s));

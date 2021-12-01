@@ -23,3 +23,5 @@ cowthink    ⟶  cowthink
 figlet      ⟶  figlet
 
 choose      ⟶  choose a random thing
+
+8ball       ⟶  ask it your deepest desires
