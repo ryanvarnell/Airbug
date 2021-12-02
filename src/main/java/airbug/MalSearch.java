@@ -1,3 +1,5 @@
+package airbug;
+
 import com.kttdevelopment.mal4j.MyAnimeList;
 import com.kttdevelopment.mal4j.anime.Anime;
 import com.kttdevelopment.mal4j.anime.AnimePreview;

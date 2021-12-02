@@ -1,3 +1,5 @@
+package airbug;
+
 import com.trievosoftware.giphy4j.Giphy;
 import com.trievosoftware.giphy4j.entity.search.SearchFeed;
 import com.trievosoftware.giphy4j.exception.GiphyException;

@@ -1,3 +1,5 @@
+package airbug;
+
 import com.github.lalyos.jfiglet.FigletFont;
 import com.github.ricksbrown.cowsay.Cowsay;
 import discord4j.core.object.entity.Message;

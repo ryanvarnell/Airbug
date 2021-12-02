@@ -1,3 +1,5 @@
+package airbug;
+
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -25,7 +27,7 @@ public class Airbug {
         Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) ->
                 gateway.on(MessageCreateEvent.class, event -> {
                     Message message = event.getMessage();
-                    // If the user's message begins with the command prompt, open a new CommandHandler and send it the
+                    // If the user's message begins with the command prompt, open a new airbug.CommandHandler and send it the
                     // message to be processed.
                     if (message.getContent().startsWith(commandPrompt)) {
                         CommandHandler commandHandler = new CommandHandler();
