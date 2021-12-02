@@ -12,7 +12,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import java.util.List;
 
 public class MalSearch {
-    private static final MyAnimeList mal = MyAnimeList.withClientID("5a62a2915c5c1c475429e7e7cb9b6864");
+    private static final String malClientID = System.getenv("MAL_CLIENT_ID");
+    private static final MyAnimeList mal = MyAnimeList.withClientID(malClientID);
 
     public static Anime searchAnime(String query) {
         List<AnimePreview> search = mal.getAnime()
