@@ -2,6 +2,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.5.0'
+    id 'com.bmuschko.docker-remote-api' version '7.1.0'
 }
 
 group 'org.example'
@@ -45,6 +46,9 @@ dependencies {
     implementation 'com.github.lalyos:jfiglet:0.0.8'
 
     implementation name: 'YouTubeSearchApi'
+
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation 'org.jsoup:jsoup:1.14.3'
 }
 
 jar {
@@ -56,3 +60,4 @@ jar {
 test {
     useJUnitPlatform()
 }
+

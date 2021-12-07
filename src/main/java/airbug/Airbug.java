@@ -29,10 +29,13 @@ public class Airbug {
                     Message message = event.getMessage();
                     // If the user's message begins with the command prompt, open a new airbug.CommandHandler and send it the
                     // message to be processed.
-                    if (message.getContent().startsWith(commandPrompt)) {
+                    String messageString = message.getContent().toLowerCase();
+                    if (messageString.startsWith(commandPrompt)) {
                         CommandHandler commandHandler = new CommandHandler();
                         return commandHandler.process(message);
-                    } else if (message.getContent().toLowerCase().contains("airbug-chan")) {
+                    }
+                    // Will respond cutely if you say airbug-chan with random emoticon
+                    else if (messageString.contains("airbug-chan")) {
                         Random random = new Random();
                         int num = random.nextInt(10);
                         String s;
@@ -49,10 +52,21 @@ public class Airbug {
                             case 9 -> s = "ayo look at this mf lmao *\"airbug-chan\"* ass";
                             default -> s = "huh";
                         }
-                        return message.getChannel().flatMap(channel -> channel.createMessage(s));
+                        return respondWith(message, s);
+                    }
+                    // If someone's message has a :) in it there's a 10% chance airbug will also respond with a :)
+                    else if (messageString.contains(":)")) {
+                        Random random = new Random();
+                        int num = random.nextInt(10);
+                        if (num == 4)
+                            return respondWith(message, ":)");
                     }
                     return Mono.empty();
                 }));
         login.block();
+    }
+
+    public static Mono<Message> respondWith(Message message, String s) {
+        return message.getChannel().flatMap(channel -> channel.createMessage(s));
     }
 }
