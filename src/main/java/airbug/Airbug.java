@@ -2,8 +2,10 @@ package airbug;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
 
 import java.util.Random;
@@ -23,50 +25,79 @@ public class Airbug {
      * Main loop
      */
     public static void main(String[] args) {
-        // Check messages for command prompt
-        Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) ->
-                gateway.on(MessageCreateEvent.class, event -> {
-                    Message message = event.getMessage();
-                    // If the user's message begins with the command prompt, open a new airbug.CommandHandler and send it the
-                    // message to be processed.
-                    String messageString = message.getContent().toLowerCase();
-                    if (messageString.startsWith(commandPrompt)) {
-                        CommandHandler commandHandler = new CommandHandler();
-                        return commandHandler.process(message);
-                    }
-                    // Will respond cutely if you say airbug-chan with random emoticon
-                    else if (messageString.contains("airbug-chan")) {
-                        Random random = new Random();
-                        int num = random.nextInt(10);
-                        String s;
-                        switch(num) {
-                            case 0 -> s = "★~(◠‿◕✿)";
-                            case 1 -> s = "★~(◡ω◕✿)";
-                            case 2 -> s = "★~(◡‿◡✿)";
-                            case 3 -> s = "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧";
-                            case 4 -> s = "(´｡• ω •｡`)";
-                            case 5 -> s = "(✿◠‿◠)";
-                            case 6 -> s = "ﾟ+.(*ﾉｪﾉ)ﾟ+";
-                            case 7 -> s = "( ͡°⁄ ⁄ ͜⁄ ⁄ʖ⁄ ⁄ ͡°)";
-                            case 8 -> s = "(´ε｀ )♡☆κｉss мё☆ﾟ";
-                            case 9 -> s = "ayo look at this mf lmao *\"airbug-chan\"* ass";
-                            default -> s = "huh";
-                        }
-                        return respondWith(message, s);
-                    }
-                    // If someone's message has a :) in it there's a 10% chance airbug will also respond with a :)
-                    else if (messageString.contains(":)")) {
-                        Random random = new Random();
-                        int num = random.nextInt(10);
-                        if (num == 4)
-                            return respondWith(message, ":)");
-                    }
-                    return Mono.empty();
-                }));
+        Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> {
+            // Confirm Airbug's login
+            Mono<Void> printOnLogin = gateway.on(ReadyEvent.class, event ->
+                    Mono.fromRunnable(() -> {
+                        final User self = event.getSelf();
+                        System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
+                    }))
+                    .then();
+
+            // Handle commands, parse messages, etc. Anything that requires reading a user's input.
+            Mono<Void> parseMessage = gateway.on(MessageCreateEvent.class, event -> {
+                Message message = event.getMessage();
+                String messageString = message.getContent().toLowerCase();
+
+                // If the user's message begins with the command prompt, open a new airbug.CommandHandler and send it
+                // the message to be processed.
+                if (messageString.startsWith(commandPrompt)) {
+                    CommandHandler commandHandler = new CommandHandler();
+                    return commandHandler.process(message);
+                }
+
+                // Airbug will respond with a cute emoticon if you say airbug-chan
+                else if (messageString.contains("airbug-chan")) {
+                    return respondTo(message, airbugChan());
+                }
+
+                // If someone's message has a :) in it there's a 10% chance airbug will also respond with a :)
+                else if (messageString.contains(":)")) {
+                    Random random = new Random();
+                    int num = random.nextInt(10);
+                    if (num == 4)
+                        return respondTo(message, ":)");
+                }
+                return Mono.empty();
+            }).then();
+
+            return printOnLogin.and(parseMessage);
+        });
+
         login.block();
     }
 
-    public static Mono<Message> respondWith(Message message, String s) {
+    /**
+     * Uses a message to create an appropriate response.
+     * @param message Message to determine correct server, channel, etc.
+     * @param s String to respond with.
+     * @return The Mono Message object.
+     */
+    public static Mono<Message> respondTo(Message message, String s) {
         return message.getChannel().flatMap(channel -> channel.createMessage(s));
+    }
+
+    /**
+     * Chooses a random cute emoticon. to respond for airbug-chan.
+     * @return Cute emoticon.
+     */
+    public static String airbugChan() {
+        Random random = new Random();
+        int num = random.nextInt(10);
+        String s;
+        switch(num) {
+            case 0 -> s = "★~(◠‿◕✿)";
+            case 1 -> s = "★~(◡ω◕✿)";
+            case 2 -> s = "★~(◡‿◡✿)";
+            case 3 -> s = "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧";
+            case 4 -> s = "(´｡• ω •｡`)";
+            case 5 -> s = "(✿◠‿◠)";
+            case 6 -> s = "ﾟ+.(*ﾉｪﾉ)ﾟ+";
+            case 7 -> s = "( ͡°⁄ ⁄ ͜⁄ ⁄ʖ⁄ ⁄ ͡°)";
+            case 8 -> s = "(´ε｀ )♡☆κｉss мё☆ﾟ";
+            case 9 -> s = "ayo look at this mf lmao *\"airbug-chan\"* ass";
+            default -> s = "huh";
+        }
+        return s;
     }
 }
