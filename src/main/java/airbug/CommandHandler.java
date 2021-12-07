@@ -102,7 +102,7 @@ public class CommandHandler {
     private Mono<Message> help() {
         Scanner scanner;
         try {
-            scanner = new Scanner(new File("help.txt"));
+            scanner = new Scanner(new File("src/resources/help.txt"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return respondWith("no help file means no help");
