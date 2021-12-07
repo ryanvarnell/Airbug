@@ -49,6 +49,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation 'org.jsoup:jsoup:1.14.3'
+
+    // https://mvnrepository.com/artifact/org.python/jython
+    implementation 'org.python:jython:2.7.2'
 }
 
 jar {

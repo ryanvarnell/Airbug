@@ -1,14 +1,19 @@
 package airbug;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
 import java.io.IOException;
 
 public class EpicGames {
-    private static final String url = "https://www.epicgames.com/store/en-US/free-games";
+    private static final String url = "https://www.epicgames.com/store/en-US/";
 
+    public static void main(String[] args) {
+        try {
+            getFreeGames();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public static void getFreeGames() throws IOException {
-        Document document = Jsoup.connect(url).get();
+        Process p = Runtime.getRuntime().exec("python /Users/ryan/IdeaProjects/airbug/libs/epicgamesfree/main.py");
+        System.out.println(p);
     }
 }
