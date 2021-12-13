@@ -12,6 +12,7 @@ import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -38,20 +39,19 @@ public class Airbug {
                         MessageChannel botSpam = gateway
                                 .getChannelById(Snowflake.of("659269065130508308"))
                                 .ofType(MessageChannel.class).block();
+                        assert botSpam != null;
                         botSpam.createMessage("hello i am awake").block();
                     }))
                     .then();
 
             // Handle commands, parse messages, etc. Anything that requires reading a user's input.
             Mono<Void> parseMessage = gateway.on(MessageCreateEvent.class, event -> {
-                boolean commandAttempt = false;
                 Message message = event.getMessage();
                 String messageString = message.getContent().toLowerCase();
 
                 // If the user's message begins with the command prompt, open a new airbug.CommandHandler and send it
                 // the message to be processed.
                 if (messageString.startsWith(commandPrompt)) {
-                    commandAttempt = true;
                     CommandHandler commandHandler = new CommandHandler();
                     return commandHandler.process(message);
                 }
@@ -72,11 +72,28 @@ public class Airbug {
                 return Mono.empty();
             }).then();
 
+
+
             return printOnLogin
                     .and(parseMessage)
                     .and(gateway.updatePresence(ClientPresence.online(ClientActivity.playing("epic games command"))));
         });
 
+        Mono<Void> checkEpic = client.withGateway((GatewayDiscordClient gateway) -> {
+            if (EpicGames.hasNewFreeGames()) {
+                MessageChannel deals = gateway
+                        .getChannelById(Snowflake.of("659258143108235275"))
+                        .ofType(MessageChannel.class).block();
+                ArrayList<String> newGames = EpicGames.getNewGames();
+                for (String game : newGames) {
+                    assert deals != null;
+                    deals.createMessage(EpicSearch.getStorePage(game)).block();
+                }
+            }
+            return Mono.empty();
+        });
+
+        checkEpic.block();
         login.block();
     }
 

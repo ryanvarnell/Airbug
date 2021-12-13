@@ -8,8 +8,33 @@ import java.util.Scanner;
  * Using modified python script from https://github.com/d4rckh/epicgamesfree
  */
 public class EpicGames {
-    public static ArrayList<String> getFreeGame() throws IOException {
-        // Grab List of current free games from Epic Games store and store them in arrayList.
+    private static final String knownFreeGamesFile = "src/resources/freeGames.txt";
+
+    public static boolean hasNewFreeGames() {
+        try {
+            ArrayList<String> freeGames = getFreeGames();
+            ArrayList<String> alreadyKnownGames = loadKnownGames();
+
+            // Check the current free games at Epic for the games we already know are free, if there are any new free
+            // games, return true.
+            for (String game : freeGames) {
+                assert alreadyKnownGames != null;
+                if (!alreadyKnownGames.contains(game)) {
+                    return true;
+                }
+            }
+        } catch (IOException ignored) {}
+
+        return false;
+    }
+
+    /**
+     * Gets all the 100% discounted games from Epic Games store.
+     * @return ArrayList containing all 100% discounted games.
+     * @throws IOException If there's an error or something.
+     */
+    private static ArrayList<String> getFreeGames() throws IOException {
+        // Runs a Python script that does the heavy lifting and stores the discounted games in freeGames.
         ArrayList<String> freeGames = new ArrayList<>();
         Process p = Runtime.getRuntime().exec("python3 libs/EpicGamesFreeQuery.py");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -18,36 +43,65 @@ public class EpicGames {
             freeGames.add(game);
         }
 
-        // Check freeGames for any duplicates (games we already knew were free and have been posted) and return any new
-        // ones
-        ArrayList<String> newFreeGames = getNewGames(freeGames);
-        if (newFreeGames.isEmpty())
-            return null;
-        return newFreeGames;
+        return freeGames;
     }
 
-    private static ArrayList<String> getNewGames(ArrayList<String> currentFreeGames) throws IOException {
-        // Get all the currently known free games stored in freeGames.txt and store them in knownFreeGames
-        String knownFreeGamesFile = "src/resources/freeGames.txt";
-        Scanner scanner = new Scanner(new File(knownFreeGamesFile));
-        ArrayList<String> knownFreeGames = new ArrayList<>();
-        while (scanner.hasNextLine()) {
-            knownFreeGames.add(scanner.nextLine());
-        }
-        scanner.close();
-
-        // Iterate through the current free games, and if any of them are new, add them to the newFreeGames ArrayList
-        // and store them in the known free games text file
+    /**
+     * Get all the new free games from Epic.
+     * @return An ArrayList containing the titles of all the new 100% discounted games.
+     */
+    public static ArrayList<String> getNewGames() {
+        ArrayList<String> currentFreeGames = null;
+        try {
+            currentFreeGames = getFreeGames();
+        } catch (IOException ignored) {}
+        ArrayList<String> knownFreeGames = loadKnownGames();
         ArrayList<String> newFreeGames = new ArrayList<>();
-        for (String freeGame : currentFreeGames) {
-            if (!knownFreeGames.contains(freeGame)) {
-                FileWriter fileWriter = new FileWriter(knownFreeGamesFile);
-                fileWriter.append(freeGame);
-                fileWriter.close();
-                newFreeGames.add(freeGame);
+        assert currentFreeGames != null;
+        for (String game: currentFreeGames) {
+            assert knownFreeGames != null;
+            if (!knownFreeGames.contains(game)) {
+                newFreeGames.add(game);
             }
         }
 
+        updateKnownFreeGames();
+
         return newFreeGames;
+    }
+
+    /**
+     * Updates the known free games list.
+     */
+    private static void updateKnownFreeGames() {
+        ArrayList<String> knownFreeGames;
+        try {
+            knownFreeGames = getFreeGames();
+            FileWriter fileWriter;
+            fileWriter = new FileWriter(knownFreeGamesFile);
+            for (String game : knownFreeGames) {
+                fileWriter.write(game + "\n");
+            }
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (Exception ignored) {}
+    }
+
+    /**
+     * Loads the games from the text file that we know to have been free recently.
+     * @return ArrayList containing names of free games.
+     */
+    private static ArrayList<String> loadKnownGames() {
+        ArrayList<String> knownGames = new ArrayList<>();
+        Scanner scanner;
+        try {
+            scanner = new Scanner(new File(knownFreeGamesFile));
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+        while (scanner.hasNextLine()) {
+            knownGames.add(scanner.nextLine());
+        }
+        return knownGames;
     }
 }
