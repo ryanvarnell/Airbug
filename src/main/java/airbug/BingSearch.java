@@ -158,7 +158,7 @@ class WikiSearch {
 }
 
 /**
- * Finds a page on Epic Games Store probably, hopefully.
+ * Searches Epic Games store
  */
 class EpicSearch {
     public static String getStorePage(String query) {

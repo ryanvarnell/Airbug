@@ -1,22 +1,17 @@
 package airbug;
 
-import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
-import discord4j.rest.entity.RestChannel;
-import reactor.core.publisher.Flux;
+import discord4j.core.object.presence.ClientActivity;
+import discord4j.core.object.presence.ClientPresence;
+import org.python.modules._io._ioTest;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
-import static java.util.Calendar.*;
+import java.util.Random;
 
 /**
  * Simple, small-scale Discord bot using Discord4J
@@ -33,15 +28,6 @@ public class Airbug {
      * Main loop
      */
     public static void main(String[] args) {
-        // Variable setup for timed events.
-        Timer timer = new Timer();
-        Calendar date = getInstance();
-        date.set(HOUR, 0);
-        date.set(MINUTE, 0);
-        date.set(SECOND, 0);
-        date.set(MILLISECOND, 0);
-        timer.schedule(new EpicGames(), date.getTime(), 1000 * 60 * 60 * 24 * 7);
-
         Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> {
             // Confirm Airbug's login
             Mono<Void> printOnLogin = gateway.on(ReadyEvent.class, event ->
@@ -53,12 +39,14 @@ public class Airbug {
 
             // Handle commands, parse messages, etc. Anything that requires reading a user's input.
             Mono<Void> parseMessage = gateway.on(MessageCreateEvent.class, event -> {
+                boolean commandAttempt = false;
                 Message message = event.getMessage();
                 String messageString = message.getContent().toLowerCase();
 
                 // If the user's message begins with the command prompt, open a new airbug.CommandHandler and send it
                 // the message to be processed.
                 if (messageString.startsWith(commandPrompt)) {
+                    commandAttempt = true;
                     CommandHandler commandHandler = new CommandHandler();
                     return commandHandler.process(message);
                 }
@@ -76,26 +64,20 @@ public class Airbug {
                         return respondTo(message, ":)");
                 }
 
-                else if (messageString.contains("testepic")) {
-                    return respondTo(message, checkFreeGameDuplicates());
-                }
                 return Mono.empty();
             }).then();
 
-            // Checks for free games on the Epic store every 12 hours.
-            Flux<Object> checkEpic = gateway.on(MessageCreateEvent.class, event -> {
-                String gameUrl = checkFreeGameDuplicates();
-                if (gameUrl != null) {
-                    RestChannel deals = gateway.getRestClient().getChannelById(Snowflake.of("659258143108235275"));
-                    deals.createMessage(gameUrl);
-                }
-                return Mono.empty();
-            });
-
-            return printOnLogin.and(parseMessage).and(checkEpic);
+            return printOnLogin
+                    .and(parseMessage)
+                    .and(gateway.updatePresence(ClientPresence.online(ClientActivity.playing("epic games command"))));
         });
 
         login.block();
+    }
+
+    private Mono<Void> deleteMessage(boolean commandAttempt, Message message) {
+        if (commandAttempt)
+            return message.delete();
     }
 
     /**
@@ -130,34 +112,5 @@ public class Airbug {
             default -> s = "huh";
         }
         return s;
-    }
-
-    public static String checkFreeGameDuplicates() {
-        try {
-            ArrayList<String> currentFreeGames = EpicGames.getFreeGames();
-            System.out.println(currentFreeGames.get(0));
-            String filePath = "src/resources/freeGames.txt";
-            Scanner scanner = new Scanner(new File("src/resources/freeGames.txt"));
-
-            // Compile the last wave of free games into a string
-            StringBuilder freeGamesString = new StringBuilder();
-            while (scanner.hasNextLine()) {
-                freeGamesString.append(scanner.nextLine()).append("\n");
-            }
-            scanner.close();
-
-            // Test the current free games against the last wave of free games to know whether to post them.
-            for (String game : currentFreeGames) {
-                if (!freeGamesString.toString().contains(game)) {
-                    FileWriter fileWriter = new FileWriter(filePath);
-                    fileWriter.write(game);
-                    fileWriter.close();
-                    return EpicSearch.getStorePage(game);
-                }
-            }
-            return null;
-        } catch (IOException e) {
-            return null;
-        }
     }
 }
