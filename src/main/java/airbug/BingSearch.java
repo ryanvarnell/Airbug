@@ -158,20 +158,6 @@ class WikiSearch {
 }
 
 /**
- * Searches Epic Games store
- */
-class EpicSearch {
-    public static String getStorePage(String query) {
-        JsonObject webpage = BingSearch.getWebPage(query + " epic games store");
-        if (webpage != null && webpage.get("url").getAsString().contains("epicgames")) {
-            return webpage.get("url").getAsString();
-        } else {
-            return null;
-        }
-    }
-}
-
-/**
  * Class to contain the search results from using Bing's API.
  */
 class SearchResults {

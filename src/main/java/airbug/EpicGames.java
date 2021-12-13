@@ -1,5 +1,7 @@
 package airbug;
 
+import com.google.gson.JsonObject;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -68,9 +70,7 @@ public class EpicGames {
                 newFreeGames.add(game);
             }
         }
-
         updateKnownFreeGames();
-
         return newFreeGames;
     }
 
@@ -107,5 +107,14 @@ public class EpicGames {
             knownGames.add(scanner.nextLine());
         }
         return knownGames;
+    }
+
+    public static String getStorePage(String query) {
+        JsonObject webpage = BingSearch.getWebPage(query + " epic games store");
+        if (webpage != null && webpage.get("url").getAsString().contains("epicgames")) {
+            return webpage.get("url").getAsString();
+        } else {
+            return null;
+        }
     }
 }

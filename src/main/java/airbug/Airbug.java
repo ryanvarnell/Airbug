@@ -87,7 +87,7 @@ public class Airbug {
                 ArrayList<String> newGames = EpicGames.getNewGames();
                 for (String game : newGames) {
                     assert deals != null;
-                    deals.createMessage(EpicSearch.getStorePage(game)).block();
+                    deals.createMessage(EpicGames.getStorePage(game)).block();
                 }
             }
             return Mono.empty();
