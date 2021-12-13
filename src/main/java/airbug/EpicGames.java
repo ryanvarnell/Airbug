@@ -109,6 +109,11 @@ public class EpicGames {
         return knownGames;
     }
 
+    /**
+     * Gets a store page for a game on Epic store
+     * @param query Name of the game to search.
+     * @return URL of store page.
+     */
     public static String getStorePage(String query) {
         JsonObject webpage = BingSearch.getWebPage(query + " epic games store");
         if (webpage != null && webpage.get("url").getAsString().contains("epicgames")) {
