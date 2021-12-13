@@ -1,14 +1,15 @@
 package airbug;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
-import org.python.modules._io._ioTest;
 import reactor.core.publisher.Mono;
 
 import java.util.Random;
@@ -34,6 +35,10 @@ public class Airbug {
                     Mono.fromRunnable(() -> {
                         final User self = event.getSelf();
                         System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
+                        MessageChannel botSpam = gateway
+                                .getChannelById(Snowflake.of("659269065130508308"))
+                                .ofType(MessageChannel.class).block();
+                        botSpam.createMessage("hello i am awake").block();
                     }))
                     .then();
 
@@ -73,11 +78,6 @@ public class Airbug {
         });
 
         login.block();
-    }
-
-    private Mono<Void> deleteMessage(boolean commandAttempt, Message message) {
-        if (commandAttempt)
-            return message.delete();
     }
 
     /**
