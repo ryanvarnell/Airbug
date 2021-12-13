@@ -10,6 +10,10 @@ import java.util.Scanner;
 public class EpicGames {
     private static final String knownFreeGamesFile = "src/resources/freeGames.txt";
 
+    /**
+     * Checks to see if Epic has any new free games listed.
+     * @return True if there's new free games, false if not.
+     */
     public static boolean hasNewFreeGames() {
         try {
             ArrayList<String> freeGames = getFreeGames();
