@@ -3,6 +3,7 @@ package airbug;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.channel.TypingStartEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
@@ -10,6 +11,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -36,11 +38,6 @@ public class Airbug {
                     Mono.fromRunnable(() -> {
                         final User self = event.getSelf();
                         System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
-                        MessageChannel botSpam = gateway
-                                .getChannelById(Snowflake.of("659269065130508308"))
-                                .ofType(MessageChannel.class).block();
-                        assert botSpam != null;
-                        botSpam.createMessage("hello i am awake").block();
                     }))
                     .then();
 
@@ -72,28 +69,29 @@ public class Airbug {
                 return Mono.empty();
             }).then();
 
-
+            // Checks for new free games on Epic, it occurs whenever someone starts typing which is jank and way too
+            // frequent, but it works for now.
+            Flux<Void> checkEpic = gateway.on(TypingStartEvent.class, event -> {
+                if (EpicGames.hasNewFreeGames()) {
+                    MessageChannel deals = gateway
+                            .getChannelById(Snowflake.of("659258143108235275"))
+                            .ofType(MessageChannel.class).block();
+                    ArrayList<String> newGames = EpicGames.getNewGames();
+                    for (String game : newGames) {
+                        assert deals != null;
+                        deals.createMessage(EpicGames.getStorePage(game)).block();
+                    }
+                }
+                return Mono.empty();
+            });
 
             return printOnLogin
                     .and(parseMessage)
-                    .and(gateway.updatePresence(ClientPresence.online(ClientActivity.playing("epic games command"))));
+                    .and(checkEpic)
+                    .and(gateway.updatePresence(ClientPresence.online(
+                            ClientActivity.playing("hey"))));
         });
 
-        Mono<Void> checkEpic = client.withGateway((GatewayDiscordClient gateway) -> {
-            if (EpicGames.hasNewFreeGames()) {
-                MessageChannel deals = gateway
-                        .getChannelById(Snowflake.of("659258143108235275"))
-                        .ofType(MessageChannel.class).block();
-                ArrayList<String> newGames = EpicGames.getNewGames();
-                for (String game : newGames) {
-                    assert deals != null;
-                    deals.createMessage(EpicGames.getStorePage(game)).block();
-                }
-            }
-            return Mono.empty();
-        });
-
-        checkEpic.block();
         login.block();
     }
 

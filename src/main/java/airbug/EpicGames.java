@@ -30,7 +30,6 @@ public class EpicGames {
                 }
             }
         } catch (IOException ignored) {}
-
         return false;
     }
 
@@ -106,6 +105,7 @@ public class EpicGames {
         while (scanner.hasNextLine()) {
             knownGames.add(scanner.nextLine());
         }
+        scanner.close();
         return knownGames;
     }
 
