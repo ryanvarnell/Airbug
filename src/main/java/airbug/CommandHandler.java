@@ -46,7 +46,7 @@ public class CommandHandler {
             case "choose" -> {return choose();}
             case "8ball" -> {return eightBall();}
             case "youtube", "yt" -> {return youtube();}
-            default -> { return respondWith("unrecognized command"); }
+            default -> { return Mono.empty(); }
         }
     }
 

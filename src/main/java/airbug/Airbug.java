@@ -1,5 +1,8 @@
 package airbug;
 
+import com.theokanning.openai.OpenAiService;
+import com.theokanning.openai.completion.CompletionChoice;
+import com.theokanning.openai.completion.CompletionRequest;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -33,6 +36,8 @@ public class Airbug {
      */
     public static void main(String[] args) {
         Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> {
+            Mono<User> airbug = gateway.getUserById(Snowflake.of("499795214387380237"));
+
             // Confirm Airbug's login
             Mono<Void> printOnLogin = gateway.on(ReadyEvent.class, event ->
                     Mono.fromRunnable(() -> {
@@ -42,13 +47,22 @@ public class Airbug {
                     .then();
 
             // Handle commands, parse messages, etc. Anything that requires reading a user's input.
-            Mono<Void> parseMessage = gateway.on(MessageCreateEvent.class, event -> {
+            Mono<Void> messageEvent = gateway.on(MessageCreateEvent.class, event -> {
                 Message message = event.getMessage();
                 String messageString = message.getContent().toLowerCase();
 
+                if (message.getAuthor().isPresent() && message.getAuthor().get().isBot()) {
+                    return Mono.empty();
+                }
+
+                else if (message.getUserMentions().contains(airbug.block())) {
+                    message.;
+                    return getAIMessage(message);
+                }
+
                 // If the user's message begins with the command prompt, open a new airbug.CommandHandler and send it
                 // the message to be processed.
-                if (messageString.startsWith(commandPrompt)) {
+                else if (messageString.startsWith(commandPrompt)) {
                     CommandHandler commandHandler = new CommandHandler();
                     return commandHandler.process(message);
                 }
@@ -66,27 +80,46 @@ public class Airbug {
                         return respondTo(message, ":)");
                 }
 
+                else {
+                    Random random = new Random();
+                    int randomNum = random.nextInt(50);
+                    if (randomNum == 24) {
+                        return getAIMessage(message);
+                    }
+                }
+
                 return Mono.empty();
             }).then();
 
-            // Checks for new free games on Epic, it occurs whenever someone starts typing which is jank and way too
+            // Checks for new free games on Epic, it occurs whenever someone starts typing which is busted and way too
             // frequent, but it works for now.
             Flux<Void> checkEpic = gateway.on(TypingStartEvent.class, event -> {
                 if (EpicGames.hasNewFreeGames()) {
                     MessageChannel deals = gateway
                             .getChannelById(Snowflake.of("659258143108235275"))
                             .ofType(MessageChannel.class).block();
+                    MessageChannel freeStuff = gateway
+                            .getChannelById(Snowflake.of("694979462592331907"))
+                            .ofType(MessageChannel.class).block();
+                    MessageChannel wallaNetFreeStuff = gateway
+                            .getChannelById(Snowflake.of("791754448741072906"))
+                            .ofType(MessageChannel.class).block();
+
                     ArrayList<String> newGames = EpicGames.getNewGames();
                     for (String game : newGames) {
                         assert deals != null;
                         deals.createMessage(EpicGames.getStorePage(game)).block();
+                        assert freeStuff != null;
+                        freeStuff.createMessage(EpicGames.getStorePage(game)).block();
+                        assert wallaNetFreeStuff != null;
+                        wallaNetFreeStuff.createMessage(EpicGames.getStorePage(game)).block();
                     }
                 }
                 return Mono.empty();
             });
 
             return printOnLogin
-                    .and(parseMessage)
+                    .and(messageEvent)
                     .and(checkEpic)
                     .and(gateway.updatePresence(ClientPresence.online(
                             ClientActivity.playing("hey"))));
@@ -127,5 +160,18 @@ public class Airbug {
             default -> s = "huh";
         }
         return s;
+    }
+
+    public static Mono<Message> getAIMessage(Message message) {
+        String token = "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";
+        OpenAiService service = new OpenAiService(token);
+        CompletionRequest completionRequest = CompletionRequest.builder()
+                .prompt(message.getContent())
+                .echo(true)
+                .build();
+        CompletionChoice completionChoice = service.createCompletion("davinci", completionRequest)
+                .getChoices().get(0);
+        String response = completionChoice.getText();
+        return respondTo(message, response);
     }
 }
