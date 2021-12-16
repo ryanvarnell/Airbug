@@ -9,7 +9,7 @@ import com.trievosoftware.giphy4j.exception.GiphyException;
  * @author Ryan Varnell
  */
 public class GiphySearch {
-    private static final String API_KEY = System.getenv("GIPHY_API_KEY");
+    private static final String API_KEY = "rcIYj6JOvJ5igGL2Gr0uCLtDOaHtBp9p";
     public static String getGif(String searchQuery) {
         Giphy giphy = new Giphy(API_KEY);
         SearchFeed feed = null;

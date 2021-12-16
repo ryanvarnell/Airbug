@@ -15,7 +15,7 @@ import java.util.List;
  * Class for search MAL.
  */
 public class MalSearch {
-    private static final String malClientID = System.getenv("MAL_CLIENT_ID");
+    private static final String malClientID = "5a62a2915c5c1c475429e7e7cb9b6864";
     private static final MyAnimeList mal = MyAnimeList.withClientID(malClientID);
 
     /**
