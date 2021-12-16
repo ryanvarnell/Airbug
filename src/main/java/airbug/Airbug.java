@@ -51,12 +51,13 @@ public class Airbug {
                 Message message = event.getMessage();
                 String messageString = message.getContent().toLowerCase();
 
+                // Ignore the message if it's from another bot.
                 if (message.getAuthor().isPresent() && message.getAuthor().get().isBot()) {
                     return Mono.empty();
                 }
 
+                // If the message mentions Airbug respond with an Ai generated message.
                 else if (message.getUserMentions().contains(airbug.block())) {
-                    message.;
                     return getAIMessage(message);
                 }
 
@@ -80,21 +81,15 @@ public class Airbug {
                         return respondTo(message, ":)");
                 }
 
-                else {
-                    Random random = new Random();
-                    int randomNum = random.nextInt(50);
-                    if (randomNum == 24) {
-                        return getAIMessage(message);
-                    }
-                }
-
                 return Mono.empty();
             }).then();
 
             // Checks for new free games on Epic, it occurs whenever someone starts typing which is busted and way too
             // frequent, but it works for now.
             Flux<Void> checkEpic = gateway.on(TypingStartEvent.class, event -> {
+                // Checks if there's new free games.
                 if (EpicGames.hasNewFreeGames()) {
+                    // Loads up the channels to post in.
                     MessageChannel deals = gateway
                             .getChannelById(Snowflake.of("659258143108235275"))
                             .ofType(MessageChannel.class).block();
@@ -104,7 +99,10 @@ public class Airbug {
                     MessageChannel wallaNetFreeStuff = gateway
                             .getChannelById(Snowflake.of("791754448741072906"))
                             .ofType(MessageChannel.class).block();
+                    MessageChannel disfunktGaming = gateway.getChannelById(Snowflake.of("702273375690817708"))
+                            .ofType(MessageChannel.class).block();
 
+                    // Posts the new games in the channels
                     ArrayList<String> newGames = EpicGames.getNewGames();
                     for (String game : newGames) {
                         assert deals != null;
@@ -113,6 +111,8 @@ public class Airbug {
                         freeStuff.createMessage(EpicGames.getStorePage(game)).block();
                         assert wallaNetFreeStuff != null;
                         wallaNetFreeStuff.createMessage(EpicGames.getStorePage(game)).block();
+                        assert disfunktGaming != null;
+                        disfunktGaming.createMessage(EpicGames.getStorePage(game)).block();
                     }
                 }
                 return Mono.empty();
@@ -122,7 +122,7 @@ public class Airbug {
                     .and(messageEvent)
                     .and(checkEpic)
                     .and(gateway.updatePresence(ClientPresence.online(
-                            ClientActivity.playing("hey"))));
+                            ClientActivity.playing("trying my best"))));
         });
 
         login.block();
@@ -162,14 +162,22 @@ public class Airbug {
         return s;
     }
 
+    /**
+     * Method to call OpenAI's api and receive a randomly generated string of text in response to a user's message.
+     * @param message The user's message to respond to.
+     * @return An AI-generated string.
+     */
     public static Mono<Message> getAIMessage(Message message) {
         String token = "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";
         OpenAiService service = new OpenAiService(token);
+        String aiPrompt = message.getContent().replace("<@!499795214387380237>", "");
         CompletionRequest completionRequest = CompletionRequest.builder()
-                .prompt(message.getContent())
+                .prompt(aiPrompt)
+                .maxTokens(64)
+                .temperature(1.0)
                 .echo(true)
                 .build();
-        CompletionChoice completionChoice = service.createCompletion("davinci", completionRequest)
+        CompletionChoice completionChoice = service.createCompletion("ada", completionRequest)
                 .getChoices().get(0);
         String response = completionChoice.getText();
         return respondTo(message, response);

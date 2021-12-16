@@ -18,7 +18,6 @@ public class YouTubeSearch {
         JsonObject item = items.get(0).getAsJsonObject();
         JsonObject id = item.get("id").getAsJsonObject();
         String videoId = id.get("videoId").getAsString();
-
         return "https://www.youtube.com/watch?v=" + videoId;
     }
 }

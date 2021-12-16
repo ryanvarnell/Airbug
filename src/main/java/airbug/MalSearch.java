@@ -11,10 +11,18 @@ import discord4j.core.spec.EmbedCreateSpec;
 
 import java.util.List;
 
+/**
+ * Class for search MAL.
+ */
 public class MalSearch {
     private static final String malClientID = System.getenv("MAL_CLIENT_ID");
     private static final MyAnimeList mal = MyAnimeList.withClientID(malClientID);
 
+    /**
+     * Searches MAL for anime.
+     * @param query User's search query.
+     * @return Anime matching search query.
+     */
     public static Anime searchAnime(String query) {
         List<AnimePreview> search = mal.getAnime()
                 .withQuery(query).includeNSFW(false)
@@ -22,6 +30,11 @@ public class MalSearch {
         return search.get(0).getAnime();
     }
 
+    /**
+     * Searches MAL for manga.
+     * @param query User's search query.
+     * @return Manga matching search query.
+     */
     public static Manga searchManga(String query) {
         List<MangaPreview> search = mal.getManga().withQuery(query)
                 .includeNSFW(false)
@@ -29,6 +42,11 @@ public class MalSearch {
         return search.get(0).getManga();
     }
 
+    /**
+     * Creates a nice embed for an anime.
+     * @param query Query to search for.
+     * @return Embed of the anime.
+     */
     public static EmbedCreateSpec getAnimeEmbed(String query) {
         Anime anime = searchAnime(query);
         return EmbedCreateSpec.builder()
@@ -44,6 +62,11 @@ public class MalSearch {
                 .build();
     }
 
+    /**
+     * Creates a nice embed for recommendations based on an anime.
+     * @param query Query to find recommendations based on.
+     * @return Embed of the anime reccomendations.
+     */
     public static EmbedCreateSpec getAnimeRecEmbed(String query) {
         Anime anime = searchAnime(query);
         AnimeRecommendation[] recs = anime.getRecommendations();
@@ -62,6 +85,11 @@ public class MalSearch {
                 .build();
     }
 
+    /**
+     * Creates a nice embed for an manga.
+     * @param query Query to search for.
+     * @return Embed of the manga.
+     */
     public static EmbedCreateSpec getMangaEmbed(String query) {
         Manga manga = searchManga(query);
         return EmbedCreateSpec.builder()
@@ -77,6 +105,11 @@ public class MalSearch {
                 .build();
     }
 
+    /**
+     * Creates a nice embed for recommendations based on an manga.
+     * @param query Query to find recommendations based on.
+     * @return Embed of the manga reccomendations.
+     */
     public static EmbedCreateSpec getMangaRecEmbed(String query) {
         Manga manga = searchManga(query);
         MangaRecommendation[] recs = manga.getRecommendations();

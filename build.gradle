@@ -66,3 +66,4 @@ test {
     useJUnitPlatform()
 }
 
+assemble.dependsOn shadowJar
