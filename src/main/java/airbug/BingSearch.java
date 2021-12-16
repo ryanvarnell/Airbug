@@ -115,7 +115,7 @@ public class BingSearch {
         JsonObject webpage = getWebPage(query);
         if (webpage != null) {
             return EmbedCreateSpec.builder()
-                    .color(Color.LIGHT_SEA_GREEN).author("Bing",
+                    .author("Bing",
                             "https://www.bing.com/",
                             "https://vignette2.wikia.nocookie.net/logopedia/images/0/09/Bing-2.png/revision/latest/scale-to-width-down/220?cb=20160504230420")
                     .thumbnail(BingSearch.getImage(webpage.get("name").getAsString()))
@@ -143,7 +143,7 @@ class WikiSearch {
         JsonObject webpage = BingSearch.getWebPage(query);
         if (webpage != null && webpage.get("url").getAsString().contains("wikipedia")) {
             return EmbedCreateSpec.builder()
-                    .color(Color.WHITE).author("Wikipedia",
+                    .author("Wikipedia",
                             "https://en.wikipedia.org/wiki/Main_Page",
                             "https://cdn.freebiesupply.com/images/large/2x/wikipedia-logo-transparent.png")
                     .thumbnail(BingSearch.getImage(query + " wikipedia"))

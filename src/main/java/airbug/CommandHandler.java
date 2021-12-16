@@ -169,10 +169,14 @@ public class CommandHandler {
     private Mono<Message> anime() {
         parse();
         EmbedCreateSpec embed;
-        if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
-            embed = MalSearch.getAnimeRecEmbed(query.toString());
-        } else {
-            embed = MalSearch.getAnimeEmbed(query.toString());
+        try {
+            if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
+                embed = MalSearch.getAnimeRecEmbed(query.toString());
+            } else {
+                embed = MalSearch.getAnimeEmbed(query.toString());
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return respondWith("no recommendations found :(");
         }
         return respondWith(embed);
     }
@@ -184,10 +188,14 @@ public class CommandHandler {
     private Mono<Message> manga() {
         parse();
         EmbedCreateSpec embed;
+        try {
         if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
             embed = MalSearch.getMangaRecEmbed(query.toString());
         } else {
             embed = MalSearch.getMangaEmbed(query.toString());
+        }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return respondWith("no recommendations found :(");
         }
         return respondWith(embed);
     }

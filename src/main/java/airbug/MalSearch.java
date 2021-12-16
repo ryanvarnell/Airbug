@@ -80,8 +80,8 @@ public class MalSearch {
                 .title(anime.getTitle())
                 .thumbnail(anime.getMainPicture().getLargeURL())
                 .addField(rec1.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                .addField(rec2.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                .addField(rec3.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
+                .addField(rec2.getTitle(), "Rating: " + rec2.getMeanRating().toString(), true)
+                .addField(rec3.getTitle(), "Rating: " + rec3.getMeanRating().toString(), true)
                 .build();
     }
 
@@ -113,18 +113,18 @@ public class MalSearch {
     public static EmbedCreateSpec getMangaRecEmbed(String query) {
         Manga manga = searchManga(query);
         MangaRecommendation[] recs = manga.getRecommendations();
-        Manga rec1 = recs[0].getManga();
-        Manga rec2 = recs[1].getManga();
-        Manga rec3 = recs[2].getManga();
         return EmbedCreateSpec.builder()
                 .author("Recommendations based on:",
                         "https://myanimelist.net/",
                         "https://image.winudf.com/v2/image/bmV0Lm15YW5pbWVsaXN0X2ljb25fMTUyNjk5MjEwNV8wODE/icon.png?w=170&fakeurl=1&type=.png")
                 .title(manga.getTitle())
                 .thumbnail(manga.getMainPicture().getLargeURL())
-                .addField(rec1.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                .addField(rec2.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
-                .addField(rec3.getTitle(), "Rating: " + rec1.getMeanRating().toString(), true)
+                .addField(recs[0].getManga().getTitle(), "Rating: "
+                        + recs[0].getManga().getMeanRating().toString(), true)
+                .addField(recs[1].getManga().getTitle(), "Rating: "
+                        + recs[1].getManga().getMeanRating().toString(), true)
+                .addField(recs[2].getManga().getTitle(), "Rating: "
+                        + recs[2].getManga().getMeanRating().toString(), true)
                 .build();
     }
 }
