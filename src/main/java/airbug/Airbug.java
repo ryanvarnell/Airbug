@@ -115,6 +115,7 @@ public class Airbug {
                         disfunktGaming.createMessage(EpicGames.getStorePage(game)).block();
                     }
                 }
+
                 return Mono.empty();
             });
 
