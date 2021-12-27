@@ -170,7 +170,8 @@ public class Airbug {
     public static Mono<Message> getAIMessage(Message message) {
         String token = "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";
         OpenAiService service = new OpenAiService(token);
-        String aiPrompt = message.getContent().replace("<@!499795214387380237>", "");
+        String aiPrompt = message.getContent().replaceAll("<@!499795214387380237>", "");
+        String firstWord = aiPrompt.trim().substring(0, aiPrompt.indexOf(" ")).toLowerCase();
         CompletionRequest completionRequest = CompletionRequest.builder()
                 .prompt(aiPrompt)
                 .maxTokens(64)
@@ -180,6 +181,27 @@ public class Airbug {
         CompletionChoice completionChoice = service.createCompletion("ada", completionRequest)
                 .getChoices().get(0);
         String response = completionChoice.getText();
+        if ((firstWord.equals("who")
+                || firstWord.equals("what")
+                || firstWord.equals("when")
+                || firstWord.equals("where")
+                || firstWord.equals("why")
+                || firstWord.equals("how")
+                || firstWord.equals("did")
+                || firstWord.equals("does")
+                || firstWord.equals("do")
+                || firstWord.equals("is")
+                || firstWord.equals("will")
+                || firstWord.equals("can")
+                || firstWord.equals("has")
+                || firstWord.equals("have")
+                || firstWord.equals("are"))
+                || (aiPrompt.trim().endsWith("?"))) {
+            response = response.replace(aiPrompt, "");
+        }
+        while (!Character.isLetter(response.charAt(0)) && !Character.isDigit(response.charAt(0))) {
+            response = response.substring(1);
+        }
         return respondTo(message, response);
     }
 }
