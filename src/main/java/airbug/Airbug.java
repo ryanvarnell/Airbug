@@ -176,7 +176,11 @@ public class Airbug {
         // space from the beginning and end of the message.
         // We grab the first word for later processing.
         StringBuilder aiPrompt = new StringBuilder(message.getContent()
-                .replaceAll("<@!499795214387380237>", "").trim());
+                .replaceAll("499795214387380237", "")
+                .replaceAll("<", "")
+                .replaceAll("@", "")
+                .replaceAll(">", "")
+                .trim());
         String firstWord;
         if (aiPrompt.toString().contains(" ")) {
             firstWord = aiPrompt.substring(0, aiPrompt.indexOf(" ")).toLowerCase();
