@@ -214,7 +214,8 @@ public class Airbug {
                 || firstWord.equals("can")
                 || firstWord.equals("has")
                 || firstWord.equals("have")
-                || firstWord.equals("are"))) {
+                || firstWord.equals("are")
+                || firstWord.equals("was"))) {
             response = response.replace(aiPrompt, "");
         }
         if (aiPrompt.toString().contains("?"))
