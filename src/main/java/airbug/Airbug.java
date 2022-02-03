@@ -171,18 +171,31 @@ public class Airbug {
     public static Mono<Message> getAIMessage(Message message) {
         String token = "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";
         OpenAiService service = new OpenAiService(token);
-        StringBuilder aiPrompt = new StringBuilder(message.getContent().replaceAll("<@!499795214387380237>", "").trim());
-        aiPrompt.append(" ");
-        String firstWord = aiPrompt.substring(0, aiPrompt.indexOf(" ")).toLowerCase();
+
+        // Create a new StringBuilder with the message content, removing each mention to the bot and dropping the white
+        // space from the beginning and end of the message.
+        // We grab the first word for later processing.
+        StringBuilder aiPrompt = new StringBuilder(message.getContent()
+                .replaceAll("<@!499795214387380237>", "").trim());
+        String firstWord;
+        if (aiPrompt.toString().contains(" ")) {
+            firstWord = aiPrompt.substring(0, aiPrompt.indexOf(" ")).toLowerCase();
+        } else {
+            firstWord = aiPrompt.toString();
+        }
+
+        // Grabs the AI response from the OpenAI API
         CompletionRequest completionRequest = CompletionRequest.builder()
                 .prompt(aiPrompt.toString())
                 .maxTokens(64)
-                .temperature(1.0)
+                .temperature(0.7)
                 .echo(true)
                 .build();
         CompletionChoice completionChoice = service.createCompletion("ada", completionRequest)
                 .getChoices().get(0);
         String response = completionChoice.getText();
+
+        // If we think the message contains a question and not a direct prompt, we want to remove it from the response.
         if ((firstWord.equals("who")
                 || firstWord.equals("what")
                 || firstWord.equals("when")
@@ -197,13 +210,33 @@ public class Airbug {
                 || firstWord.equals("can")
                 || firstWord.equals("has")
                 || firstWord.equals("have")
-                || firstWord.equals("are"))
-                || (aiPrompt.toString().contains("?"))) {
+                || firstWord.equals("are"))) {
             response = response.replace(aiPrompt, "");
         }
-        while (!Character.isLetter(response.charAt(0)) && !Character.isDigit(response.charAt(0))) {
+        if (aiPrompt.toString().contains("?"))
+            response = response.substring(response.indexOf("?") + 1).trim();
+
+        // Makes sure the response starts with a letter or quotation mark, for neat formatting.
+        while (!(Character.isAlphabetic(response.charAt(0))
+                || Character.isDigit(response.charAt(0))
+                || (response.charAt(0) == '\"'))) {
             response = response.substring(1);
         }
+
+        // Add an elipsis if the response seems to start in the middle of a thought.
+        if (Character.isLowerCase(response.trim().charAt(0))) {
+            response = "...".concat(response.trim());
+        }
+
+        // Even out quotation marks if need be. This seems super inefficient but who cares.
+        int quotationCount = 0;
+        for (char c : response.toCharArray()) {
+            if (c =='"')
+                quotationCount++;
+        }
+        if (quotationCount % 2 != 0)
+            response = "\"".concat(response);
+
         return respondTo(message, response);
     }
 }
