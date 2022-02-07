@@ -228,11 +228,6 @@ public class Airbug {
             response = response.substring(1);
         }
 
-        // Add an elipsis if the response seems to start in the middle of a thought.
-        if (Character.isLowerCase(response.trim().charAt(0))) {
-            response = "...".concat(response.trim());
-        }
-
         // Even out quotation marks if need be. This seems super inefficient but who cares.
         int quotationCount = 0;
         for (char c : response.toCharArray()) {
