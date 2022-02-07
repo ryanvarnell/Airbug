@@ -44,7 +44,7 @@ public class CommandHandler {
             case "cowthink", "ct" -> {return cowthink();}
             case "figlet" -> {return figlet();}
             case "choose" -> {return choose();}
-            case "8ball" -> {return eightBall();}
+            case "8ball", "8b" -> {return eightBall();}
             case "youtube", "yt" -> {return youtube();}
             default -> { return Mono.empty(); }
         }
@@ -129,7 +129,12 @@ public class CommandHandler {
      */
     private Mono<Message> img() {
         parse();
-        return respondWith(BingSearch.getImage(query.toString()));
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: image, img
+                    > **usage:** img [query]""");
+        } else
+            return respondWith(BingSearch.getImage(query.toString()));
     }
 
     /**
@@ -138,7 +143,12 @@ public class CommandHandler {
      */
     private Mono<Message> gif() {
         parse();
-        return respondWith(GiphySearch.getGif(query.toString()));
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: giphy, gif
+                    > **usage:** gif [query]""");
+        } else
+            return respondWith(GiphySearch.getGif(query.toString()));
     }
 
     /**
@@ -150,7 +160,12 @@ public class CommandHandler {
         if (commands.get(0).equalsIgnoreCase("bing")
                 && query.toString().equalsIgnoreCase("chilling"))
             return bingChilling();
-        return respondWith(BingSearch.getWebpageEmbed(query.toString()));
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: bing, b, google, g, duckduckgo, ddg, askjeeves, aj, search
+                    > **usage:** bing [query]""");
+        } else
+            return respondWith(BingSearch.getWebpageEmbed(query.toString()));
     }
 
     /**
@@ -159,7 +174,12 @@ public class CommandHandler {
      */
     private Mono<Message> wiki() {
         parse();
-        return respondWith(WikiSearch.getWikiEmbed(query + " wikipedia"));
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: wiki, w
+                    > **usage:** wiki [query]""");
+        } else
+            return respondWith(WikiSearch.getWikiEmbed(query + " wikipedia"));
     }
 
     /**
@@ -168,17 +188,23 @@ public class CommandHandler {
      */
     private Mono<Message> anime() {
         parse();
-        EmbedCreateSpec embed;
-        try {
-            if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
-                embed = MalSearch.getAnimeRecEmbed(query.toString());
-            } else {
-                embed = MalSearch.getAnimeEmbed(query.toString());
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: anime, a
+                    > **usage:** anime [flags: !rec] [query]""");
+        } else {
+            EmbedCreateSpec embed;
+            try {
+                if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
+                    embed = MalSearch.getAnimeRecEmbed(query.toString());
+                } else {
+                    embed = MalSearch.getAnimeEmbed(query.toString());
+                }
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return respondWith("no recommendations found :(");
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return respondWith("no recommendations found :(");
+            return respondWith(embed);
         }
-        return respondWith(embed);
     }
 
     /**
@@ -187,17 +213,23 @@ public class CommandHandler {
      */
     private Mono<Message> manga() {
         parse();
-        EmbedCreateSpec embed;
-        try {
-        if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
-            embed = MalSearch.getMangaRecEmbed(query.toString());
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: manga, m
+                    > **usage:** manga [flags: !rec] [query]""");
         } else {
-            embed = MalSearch.getMangaEmbed(query.toString());
+            EmbedCreateSpec embed;
+            try {
+                if (commands.size() > 1 && commands.get(1).equalsIgnoreCase("rec")) {
+                    embed = MalSearch.getMangaRecEmbed(query.toString());
+                } else {
+                    embed = MalSearch.getMangaEmbed(query.toString());
+                }
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return respondWith("no recommendations found :(");
+            }
+            return respondWith(embed);
         }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return respondWith("no recommendations found :(");
-        }
-        return respondWith(embed);
     }
 
     /**
@@ -206,7 +238,12 @@ public class CommandHandler {
      */
     private Mono<Message> cowsay() {
         parse();
-        return respondWith("```\n" + Cowsay.say(new String[]{query.toString()}) + "\n```");
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: cowsay, cs
+                    > **usage:** cowsay [text]""");
+        } else
+            return respondWith("```\n" + Cowsay.say(new String[]{query.toString()}) + "\n```");
     }
 
     /**
@@ -215,6 +252,11 @@ public class CommandHandler {
      */
     private Mono<Message> cowthink() {
         parse();
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: cowthink, ct
+                    > **usage:** cowthink [text]""");
+        } else
         return respondWith("```\n" + Cowsay.think(new String[]{query.toString()}) + "\n```");
     }
 
@@ -224,11 +266,16 @@ public class CommandHandler {
      */
     private Mono<Message> figlet() {
         parse();
-        try {
-            return respondWith("```\n" + FigletFont.convertOneLine(query.toString()) + "\n```");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return respondWith("something went wrong");
+        if (query.isEmpty()) {
+            return respondWith("""
+                    > **usage:** figlet [text]""");
+        } else {
+            try {
+                return respondWith("```\n" + FigletFont.convertOneLine(query.toString()) + "\n```");
+            } catch (IOException e) {
+                e.printStackTrace();
+                return respondWith("something went wrong");
+            }
         }
     }
 
@@ -238,10 +285,15 @@ public class CommandHandler {
      */
     private Mono<Message> choose() {
         parse();
-        String[] choices = query.toString().split(",");
-        Random random = new Random();
-        int randInt = random.nextInt(choices.length);
-        return respondWith(choices[randInt].trim());
+        if (query.isEmpty()) {
+            return respondWith("""
+                    > **usage:** choose [item1, item2, item3, etc.]""");
+        } else {
+            String[] choices = query.toString().split(",");
+            Random random = new Random();
+            int randInt = random.nextInt(choices.length);
+            return respondWith(choices[randInt].trim());
+        }
     }
 
     /**
@@ -249,48 +301,54 @@ public class CommandHandler {
      * @return A positive, neutral, or pessimistic response.
      */
     private Mono<Message> eightBall() {
-        Random random = new Random();
-        int num = random.nextInt(3);
-        String s = "";
-        switch(num) {
-            case 0 -> {
-                num = random.nextInt(10);
-                switch (num) {
-                    case 0 -> s = "yeah probably";
-                    case 1 -> s = "def";
-                    case 2 -> s = "for SURE";
-                    case 3 -> s = "yeah";
-                    case 4 -> s = "of course :)";
-                    case 5 -> s = "I don't see why not";
-                    case 6 -> s = "most likely";
-                    case 7 -> s = "8-ball says... :flushed:";
-                    case 8 -> s = "sure";
-                    case 9 -> s = ":triumph::triumph::triumph::triumph::triumph: yea";
+        if (query.isEmpty()) {
+            return respondWith("""
+                    aliases: 8ball, 8b
+                    > **usage:** 8ball [question]""");
+        } else {
+            Random random = new Random();
+            int num = random.nextInt(3);
+            String s = "";
+            switch (num) {
+                case 0 -> {
+                    num = random.nextInt(10);
+                    switch (num) {
+                        case 0 -> s = "yeah probably";
+                        case 1 -> s = "def";
+                        case 2 -> s = "for SURE";
+                        case 3 -> s = "yeah";
+                        case 4 -> s = "of course :)";
+                        case 5 -> s = "I don't see why not";
+                        case 6 -> s = "most likely";
+                        case 7 -> s = "8-ball says... :flushed:";
+                        case 8 -> s = "sure";
+                        case 9 -> s = ":triumph::triumph::triumph::triumph::triumph: yea";
+                    }
                 }
-            }
-            case 1 -> {
-                num = random.nextInt(5);
-                switch (num) {
-                    case 0 -> s = "idk";
-                    case 1 -> s = "sky looks a little cloudy, hard 2 say";
-                    case 2 -> s = "can't say for sure";
-                    case 3 -> s = "im sorry what";
-                    case 4 -> s = "best not said out loud i think";
+                case 1 -> {
+                    num = random.nextInt(5);
+                    switch (num) {
+                        case 0 -> s = "idk";
+                        case 1 -> s = "sky looks a little cloudy, hard 2 say";
+                        case 2 -> s = "can't say for sure";
+                        case 3 -> s = "im sorry what";
+                        case 4 -> s = "best not said out loud i think";
+                    }
                 }
-            }
-            case 2 -> {
-                num = random.nextInt(5);
-                switch (num) {
-                    case 0 -> s = "ain't lookin too hot buddy";
-                    case 1 -> s = "yikes";
-                    case 2 -> s = "big no";
-                    case 3 -> s = "absolutely not";
-                    case 4 -> s = "lol no";
+                case 2 -> {
+                    num = random.nextInt(5);
+                    switch (num) {
+                        case 0 -> s = "ain't lookin too hot buddy";
+                        case 1 -> s = "yikes";
+                        case 2 -> s = "big no";
+                        case 3 -> s = "absolutely not";
+                        case 4 -> s = "lol no";
+                    }
                 }
+                default -> s = "something went wrong";
             }
-            default -> s = "something went wrong";
+            return respondWith(s);
         }
-        return respondWith(s);
     }
 
     /**

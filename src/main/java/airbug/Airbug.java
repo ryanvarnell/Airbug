@@ -29,7 +29,7 @@ public class Airbug {
     private static final String discordToken = "NDk5Nzk1MjE0Mzg3MzgwMjM3.W77MkA.yl_GO1rFiB4Q1H-v6e8P_26J8t8";
     private static final DiscordClient client = DiscordClient.create(discordToken);
     // Anything here will work as a prompt.
-    public static final String commandPrompt = "-";
+    public static final String commandPrompt = "!";
 
     /**
      * Main loop
