@@ -23,7 +23,7 @@ import java.util.Scanner;
  * @author Ryan Varnell.
  */
 public class BingSearch {
-    private final static String subscriptionKey = "8e2864948e0040948ad5758bb1fa48ea";
+    private final static String subscriptionKey = "placeholder";
     private final static String host = "https://api.bing.microsoft.com";
 
     /**
