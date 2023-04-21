@@ -26,7 +26,7 @@ import java.util.Random;
  */
 public class Airbug {
     // Instantiate a DiscordClient using bot token.
-    private static final String discordToken = "NDk5Nzk1MjE0Mzg3MzgwMjM3.W77MkA.yl_GO1rFiB4Q1H-v6e8P_26J8t8";
+    private static final String discordToken = "token here";
     private static final DiscordClient client = DiscordClient.create(discordToken);
     // Anything here will work as a prompt.
     public static final String commandPrompt = "!";
@@ -36,7 +36,7 @@ public class Airbug {
      */
     public static void main(String[] args) {
         Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> {
-            Mono<User> airbug = gateway.getUserById(Snowflake.of("499795214387380237"));
+            Mono<User> airbug = gateway.getUserById(Snowflake.of("placeholder"));
 
             // Confirm Airbug's login
             Mono<Void> printOnLogin = gateway.on(ReadyEvent.class, event ->
@@ -91,15 +91,15 @@ public class Airbug {
                 if (EpicGames.hasNewFreeGames()) {
                     // Loads up the channels to post in.
                     MessageChannel deals = gateway
-                            .getChannelById(Snowflake.of("659258143108235275"))
+                            .getChannelById(Snowflake.of("placeholder"))
                             .ofType(MessageChannel.class).block();
                     MessageChannel freeStuff = gateway
-                            .getChannelById(Snowflake.of("694979462592331907"))
+                            .getChannelById(Snowflake.of("placeholder"))
                             .ofType(MessageChannel.class).block();
                     MessageChannel wallaNetFreeStuff = gateway
-                            .getChannelById(Snowflake.of("791754448741072906"))
+                            .getChannelById(Snowflake.of("placeholder"))
                             .ofType(MessageChannel.class).block();
-                    MessageChannel disfunktGaming = gateway.getChannelById(Snowflake.of("702273375690817708"))
+                    MessageChannel disfunktGaming = gateway.getChannelById(Snowflake.of("placeholder"))
                             .ofType(MessageChannel.class).block();
 
                     // Posts the new games in the channels
@@ -169,14 +169,14 @@ public class Airbug {
      * @return An AI-generated string.
      */
     public static Mono<Message> getAIMessage(Message message) {
-        String token = "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";
+        String token = "placeholder";
         OpenAiService service = new OpenAiService(token);
 
         // Create a new StringBuilder with the message content, removing each mention to the bot and dropping the white
         // space from the beginning and end of the message.
         // We grab the first word for later processing.
         StringBuilder aiPrompt = new StringBuilder(message.getContent()
-                .replaceAll("499795214387380237", "")
+                .replaceAll("placeholder", "")
                 .replaceAll("<", "")
                 .replaceAll("@", "")
                 .replaceAll(">", "")
