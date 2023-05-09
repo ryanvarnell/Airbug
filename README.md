@@ -1,6 +1,6 @@
 # AirBug v1
 
-<img src="source/images/airbugLogo.png" alt="Airbug Logo" style="width: 150px; float: right;">
+<img src="source/images/airbugLogo.png" alt="Airbug Logo" align="right" width="150">
 
 This was a very early attempt at a bot for Discord using Discord4J.\
 The project has since been migrated to a JavaScript/Node.js/Discord.js base, which is currently being kept in a (as of 
@@ -10,9 +10,14 @@ works because of the numerous updates Discord has been through since this was la
 # Features
 
 ## AI responses
-
-<img src="source/images/AI.png" alt="Airbug AI Responses" style="box-shadow: 0 0 18px black; border-radius: 10px; display: block; margin-left: auto; margin-right: auto;">
-<a href="https://openai.com/"><img src="source/images/openAIlogo.png" alt="OpenAI Logo" style="width: 200px; display: block; margin-left: auto; margin-right: auto; padding-top: 15px; padding-bottom: 15px;"></a>
+<p align="center">
+    <img src="source/images/AI.png" alt="Airbug AI Responses">
+</p>
+<a href="https://openai.com/">
+    <p align="center">
+        <img src="source/images/openAIlogo.png" alt="OpenAI Logo" width="200">
+    </p>
+</a>
 Built with OpenAI's GPT3 model (pre-ChatGPT) using the "ada" base. "Ada" was great, as it was quick and cheap, but not
 nearly as coherent as the "Davinci" base would have been, which was much more costly and slow. As a consequence, these 
 responses were far below the mark we expect from ChatGPT today.
@@ -24,7 +29,9 @@ of aliases, so you can really use any search engine name as a command if you so 
 ```
 -bing [query]
 ```
-<img src="source/images/webSearch.png" alt="Web Search" style="box-shadow: 0 0 18px black; border-radius: 10px; display: block; margin-left: auto; margin-right: auto;">
+<p align="center">
+    <img src="source/images/webSearch.png" alt="Web Search">
+</p>
 
 ## Wikipedia Search
 
@@ -32,27 +39,33 @@ Airbug can grab a Wikipedia page, given a query.
 ```
 -wiki [query]
 ```
-<img src="source/images/wikiSearch.png" alt="Wiki Search" style="box-shadow: 0 0 18px black; border-radius: 10px; display: block; margin-left: auto; margin-right: auto;">
+<p align="center">
+    <img src="source/images/wikiSearch.png" alt="Wiki Search">
+</p>
 
 ## MyAnimeList Integration
 
 AirBug is able to search and provide information on any manga or anime on 
-<a href="https://myanimelist.net/"><img src="source/images/myAnimeListLogo.png" alt="MyAnimeList Logo" style="height: 1.3em; transform: translate(0, 0.3em);"></a>, as well as
+<a href="https://myanimelist.net/"><img src="source/images/myAnimeListLogo.png" alt="MyAnimeList Logo" height="20px"></a>, as well as
 offer recommendations based on a given title.
 
-<h3 style="text-align: center;">Anime/Manga Search</h3>
+<h3 align="center">Anime/Manga Search</h3>
 ```
 -anime [query]
 -manga [query]
 ```
-<img src="source/images/animeSearch.png" alt="Anime/Manga Search" style="box-shadow: 0 0 18px black; border-radius: 10px; display: block; margin-left: auto; margin-right: auto;">
+<p align="center">
+    <img src="source/images/animeSearch.png" alt="Anime/Manga Search">
+</p>
 
-<h3 style="text-align: center;">Anime/Manga Recommendations</h3>
+<h3 align="center">Anime/Manga Recommendations</h3>
 ```
 -anime -rec [query]
 -manga -rec [query]
 ```
-<img src="source/images/mangarec.png" alt="Anime/Manga Recommendations" style="box-shadow: 0 0 18px black; border-radius: 10px; display: block; margin-left: auto; margin-right: auto;">
+<p align="center">
+    <img src="source/images/mangarec.png" alt="Anime/Manga Recommendations">
+</p>
 
 ## Other Commands
 
