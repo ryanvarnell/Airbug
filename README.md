@@ -1,6 +1,6 @@
 # AirBug v1
 
-<img src="source/images/airbugLogo.png" alt="Mobile view of website." style="width: 150px; float: right;">
+<img src="source/images/airbugLogo.png" alt="Airbug Logo" style="width: 150px; float: right;">
 
 This was a very early attempt at a bot for Discord using Discord4J.\
 The project has since been migrated to a JavaScript/Node.js/Discord.js base, which is currently being kept in a (as of 
